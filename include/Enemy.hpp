@@ -1,0 +1,28 @@
+#ifndef ENEMY_HPP
+#define ENEMY_HPP
+
+#include "Character.hpp"
+
+class Enemy : public Character {
+public:
+    virtual ~Enemy() = default;
+
+    virtual void Update(float deltaTimeSeconds, const glm::vec2 &targetPosition);
+
+    int GetContactDamage() const { return m_ContactDamage; }
+    int GetExperienceValue() const { return m_ExperienceValue; }
+    const std::string &GetEnemyName() const { return m_EnemyName; }
+
+protected:
+    Enemy(const std::string &fontPath, const std::string &glyph, int fontSize,
+          const Util::Color &color, const glm::vec2 &spawnPosition,
+          float radius, float moveSpeed, int hitPoints, int contactDamage,
+          int experienceValue, std::string enemyName);
+
+private:
+    int m_ContactDamage = 1;
+    int m_ExperienceValue = 1;
+    std::string m_EnemyName;
+};
+
+#endif

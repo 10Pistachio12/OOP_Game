@@ -1,9 +1,35 @@
 set(SRC_FILES
     App.cpp
+    BatEnemy.cpp
+    Enemy.cpp
+    ExperienceGem.cpp
+    GameScene.cpp
+    GlyphObject.cpp
+    Hud.cpp
+    MagicBoltWeapon.cpp
+    Player.cpp
+    Projectile.cpp
+    SlimeEnemy.cpp
+    Upgrade.cpp
+    UpgradeManager.cpp
 )
 
 set(INCLUDE_FILES
     App.hpp
+    BatEnemy.hpp
+    Character.hpp
+    Enemy.hpp
+    ExperienceGem.hpp
+    GameScene.hpp
+    GlyphObject.hpp
+    Hud.hpp
+    MagicBoltWeapon.hpp
+    Player.hpp
+    Projectile.hpp
+    SlimeEnemy.hpp
+    Upgrade.hpp
+    UpgradeManager.hpp
+    Weapon.hpp
 )
 
 set(TEST_FILES

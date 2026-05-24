@@ -20,7 +20,11 @@ FetchContent_Declare(
     SOURCE_DIR  ${CMAKE_CURRENT_SOURCE_DIR}/PTSD
 )
 
+# CMake 4.x dropped compatibility with policies older than 3.5.
+# Set a minimum policy version only while configuring the vendored PTSD tree.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 FetchContent_MakeAvailable(ptsd)
+unset(CMAKE_POLICY_VERSION_MINIMUM)
 
 include(files.cmake)
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
@@ -34,7 +38,7 @@ list(TRANSFORM INCLUDE_FILES PREPEND ${INCLUDE_DIR}/)
 add_executable(${PROJECT_NAME}
     ${SRC_DIR}/main.cpp
     ${SRC_FILES}
-    ${HEADER_FILES}
+    ${INCLUDE_FILES}
 )
 
 if(MSVC)

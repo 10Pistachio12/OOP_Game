@@ -3,6 +3,8 @@
 
 #include "pch.hpp" // IWYU pragma: export
 
+#include "GameScene.hpp"
+
 class App {
 public:
     enum class State {
@@ -14,16 +16,12 @@ public:
     State GetCurrentState() const { return m_CurrentState; }
 
     void Start();
-
     void Update();
-
     void End(); // NOLINT(readability-convert-member-functions-to-static)
 
 private:
-    void ValidTask();
-
-private:
     State m_CurrentState = State::START;
+    std::unique_ptr<GameScene> m_GameScene = std::make_unique<GameScene>();
 };
 
 #endif
