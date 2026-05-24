@@ -4,10 +4,8 @@
 
 #include <glm/geometric.hpp>
 
-#include "ArcaneNovaWeapon.hpp"
 #include "BatEnemy.hpp"
 #include "BruteEnemy.hpp"
-#include "MagicBoltWeapon.hpp"
 #include "SlimeEnemy.hpp"
 #include "Util/Input.hpp"
 #include "Util/Keycode.hpp"
@@ -32,7 +30,7 @@ GameScene::GameScene()
     : m_FontPath(std::string(RESOURCE_DIR) + "/Inter.ttf"),
       m_Hud(std::make_shared<Hud>(m_FontPath)),
       m_Player(std::make_shared<Player>(m_FontPath)),
-      m_Weapons(std::make_unique<WeaponInventory>()),
+      m_Weapons(std::make_unique<WeaponInventory>(m_FontPath)),
       m_Rng(std::random_device{}()),
       m_EnemyDirector(std::make_unique<EnemyDirector>(m_Rng)),
       m_UpgradeManager(std::make_unique<UpgradeManager>(m_Rng)) {}
@@ -110,9 +108,8 @@ void GameScene::Reset() {
 
     m_Player = std::make_shared<Player>(m_FontPath);
     m_Hud = std::make_shared<Hud>(m_FontPath);
-    m_Weapons = std::make_unique<WeaponInventory>();
-    m_Weapons->AddWeapon(std::make_unique<MagicBoltWeapon>(m_FontPath));
-    m_Weapons->AddWeapon(std::make_unique<ArcaneNovaWeapon>(m_FontPath));
+    m_Weapons = std::make_unique<WeaponInventory>(m_FontPath);
+    m_Weapons->UnlockWeapon(WeaponType::MagicBolt);
     m_EnemyDirector = std::make_unique<EnemyDirector>(m_Rng);
     m_UpgradeManager = std::make_unique<UpgradeManager>(m_Rng);
     m_UpgradeChoices.clear();
@@ -128,7 +125,7 @@ void GameScene::EnterLevelUp() {
     }
 
     m_Status = Status::LEVEL_UP;
-    m_UpgradeChoices = m_UpgradeManager->GenerateChoices(3);
+    m_UpgradeChoices = m_UpgradeManager->GenerateChoices(3, *m_Weapons);
 }
 
 void GameScene::HandleLevelUpInput() {
@@ -151,7 +148,7 @@ void GameScene::HandleLevelUpInput() {
     --m_PendingLevelUps;
 
     if (m_PendingLevelUps > 0) {
-        m_UpgradeChoices = m_UpgradeManager->GenerateChoices(3);
+        m_UpgradeChoices = m_UpgradeManager->GenerateChoices(3, *m_Weapons);
         return;
     }
 

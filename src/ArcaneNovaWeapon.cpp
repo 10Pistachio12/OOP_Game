@@ -12,7 +12,7 @@ constexpr float TWO_PI = 6.28318530718F;
 }
 
 ArcaneNovaWeapon::ArcaneNovaWeapon(const std::string &fontPath)
-    : Weapon(2.4F),
+    : Weapon(WeaponType::ArcaneNova, 2.4F, 5),
       m_FontPath(fontPath) {}
 
 std::vector<std::shared_ptr<Projectile>> ArcaneNovaWeapon::UpdateAndFire(
@@ -42,10 +42,38 @@ std::vector<std::shared_ptr<Projectile>> ArcaneNovaWeapon::UpdateAndFire(
     return spawnedProjectiles;
 }
 
-void ArcaneNovaWeapon::OnOwnerLevelUp() {
-    m_CooldownSeconds = std::max(0.65F, m_CooldownSeconds * 0.94F);
-    if (m_ProjectilesPerBurst < 16) {
-        ++m_ProjectilesPerBurst;
+std::string ArcaneNovaWeapon::GetLevelUpDescription() const {
+    switch (GetLevel() + 1) {
+        case 2:
+            return "+2 projectiles per burst";
+        case 3:
+            return "-15% cooldown";
+        case 4:
+            return "+1 damage";
+        case 5:
+            return "+2 projectiles and +0.25s lifetime";
+        default:
+            return "Max level";
+    }
+}
+
+void ArcaneNovaWeapon::ApplyLevelUp() {
+    switch (GetLevel()) {
+        case 2:
+            m_ProjectilesPerBurst += 2;
+            break;
+        case 3:
+            MultiplyCooldown(0.85F);
+            break;
+        case 4:
+            IncreaseDamage(1);
+            break;
+        case 5:
+            m_ProjectilesPerBurst += 2;
+            m_LifetimeSeconds += 0.25F;
+            break;
+        default:
+            break;
     }
 }
 

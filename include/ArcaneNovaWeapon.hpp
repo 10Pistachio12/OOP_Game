@@ -12,8 +12,9 @@ public:
         const std::vector<std::shared_ptr<Enemy>> &enemies,
         float deltaTimeSeconds) override;
 
-    void OnOwnerLevelUp() override;
     std::string GetDisplayName() const override { return "Arcane Nova"; }
+    std::string GetLevelUpDescription() const override;
+    void ApplyLevelUp() override;
     void IncreaseDamage(int amount) override;
     void MultiplyCooldown(float multiplier) override;
 

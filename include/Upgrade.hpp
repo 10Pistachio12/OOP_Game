@@ -3,6 +3,8 @@
 
 #include "pch.hpp"
 
+#include "Weapon.hpp"
+
 class Player;
 class WeaponInventory;
 
@@ -48,6 +50,33 @@ public:
     std::string GetName() const override { return "Quick Cast"; }
     std::string GetDescription() const override { return "-14% cooldown on all weapons"; }
     void Apply(Player &player, WeaponInventory &weapons) const override;
+};
+
+class UnlockWeaponUpgrade final : public Upgrade {
+public:
+    explicit UnlockWeaponUpgrade(WeaponType weaponType);
+
+    std::string GetName() const override;
+    std::string GetDescription() const override;
+    void Apply(Player &player, WeaponInventory &weapons) const override;
+
+private:
+    WeaponType m_WeaponType;
+};
+
+class WeaponLevelUpgrade final : public Upgrade {
+public:
+    WeaponLevelUpgrade(WeaponType weaponType, int nextLevel,
+                       std::string description);
+
+    std::string GetName() const override;
+    std::string GetDescription() const override;
+    void Apply(Player &player, WeaponInventory &weapons) const override;
+
+private:
+    WeaponType m_WeaponType;
+    int m_NextLevel = 1;
+    std::string m_Description;
 };
 
 #endif

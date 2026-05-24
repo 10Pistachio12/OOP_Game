@@ -7,7 +7,7 @@
 #include "Projectile.hpp"
 
 MagicBoltWeapon::MagicBoltWeapon(const std::string &fontPath)
-    : Weapon(0.6F),
+    : Weapon(WeaponType::MagicBolt, 0.6F, 5),
       m_FontPath(fontPath) {}
 
 std::vector<std::shared_ptr<Projectile>> MagicBoltWeapon::UpdateAndFire(
@@ -48,10 +48,40 @@ std::vector<std::shared_ptr<Projectile>> MagicBoltWeapon::UpdateAndFire(
     return spawnedProjectiles;
 }
 
-void MagicBoltWeapon::OnOwnerLevelUp() {
-    m_CooldownSeconds = std::max(0.15F, m_CooldownSeconds * 0.92F);
-    ++m_Damage;
-    m_ProjectileSpeed += 18.0F;
+std::string MagicBoltWeapon::GetLevelUpDescription() const {
+    switch (GetLevel() + 1) {
+        case 2:
+            return "+1 damage";
+        case 3:
+            return "-12% cooldown";
+        case 4:
+            return "+45 projectile speed and +0.2s lifetime";
+        case 5:
+            return "+1 damage and -10% cooldown";
+        default:
+            return "Max level";
+    }
+}
+
+void MagicBoltWeapon::ApplyLevelUp() {
+    switch (GetLevel()) {
+        case 2:
+            IncreaseDamage(1);
+            break;
+        case 3:
+            MultiplyCooldown(0.88F);
+            break;
+        case 4:
+            m_ProjectileSpeed += 45.0F;
+            m_LifetimeSeconds += 0.2F;
+            break;
+        case 5:
+            IncreaseDamage(1);
+            MultiplyCooldown(0.90F);
+            break;
+        default:
+            break;
+    }
 }
 
 void MagicBoltWeapon::IncreaseDamage(int amount) {

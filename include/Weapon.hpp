@@ -7,10 +7,28 @@ class Enemy;
 class Player;
 class Projectile;
 
+enum class WeaponType {
+    MagicBolt,
+    ArcaneNova,
+};
+
+inline std::string GetWeaponTypeDisplayName(WeaponType type) {
+    switch (type) {
+        case WeaponType::MagicBolt:
+            return "Magic Bolt";
+        case WeaponType::ArcaneNova:
+            return "Arcane Nova";
+        default:
+            return "Unknown Weapon";
+    }
+}
+
 class Weapon {
 public:
-    explicit Weapon(float cooldownSeconds)
-        : m_CooldownSeconds(cooldownSeconds) {}
+    Weapon(WeaponType type, float cooldownSeconds, int maxLevel)
+        : m_Type(type),
+          m_CooldownSeconds(cooldownSeconds),
+          m_MaxLevel(maxLevel) {}
     virtual ~Weapon() = default;
 
     virtual std::vector<std::shared_ptr<Projectile>> UpdateAndFire(
@@ -18,16 +36,34 @@ public:
         const std::vector<std::shared_ptr<Enemy>> &enemies,
         float deltaTimeSeconds) = 0;
 
-    virtual void OnOwnerLevelUp() = 0;
     virtual std::string GetDisplayName() const = 0;
+    virtual std::string GetLevelUpDescription() const = 0;
+    virtual void ApplyLevelUp() = 0;
     virtual void IncreaseDamage(int amount) = 0;
     virtual void MultiplyCooldown(float multiplier) = 0;
 
+    bool LevelUp() {
+        if (!CanLevelUp()) {
+            return false;
+        }
+
+        ++m_Level;
+        ApplyLevelUp();
+        return true;
+    }
+
+    WeaponType GetType() const { return m_Type; }
+    int GetLevel() const { return m_Level; }
+    int GetMaxLevel() const { return m_MaxLevel; }
+    bool CanLevelUp() const { return m_Level < m_MaxLevel; }
     float GetCooldownSeconds() const { return m_CooldownSeconds; }
 
 protected:
+    WeaponType m_Type;
     float m_CooldownSeconds = 0.0F;
     float m_CooldownRemaining = 0.0F;
+    int m_Level = 1;
+    int m_MaxLevel = 1;
 };
 
 #endif

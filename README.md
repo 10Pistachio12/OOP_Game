@@ -9,12 +9,14 @@ upgrades on level up.
 ## Current Features
 
 - WeaponInventory supports multiple automatic weapons.
+- The player starts with Magic Bolt and can unlock Arcane Nova through level-up choices.
+- Each weapon has levels and weapon-specific upgrade effects.
 - Auto-targeting Magic Bolt weapon and radial Arcane Nova burst weapon.
 - Slime, Bat, and Brute enemy classes derived from a shared Enemy base.
 - EnemyDirector controls timed phases, spawn rate, batch size, and enemy mix.
 - XP gems are magnetized toward the player within pickup range.
-- Level-up upgrade choices for movement, health, pickup range, all-weapon damage, and all-weapon cooldown.
-- HUD shows HP, level, XP, survival time, wave phase, and enemy count.
+- Level-up choices include character stats, all-weapon bonuses, weapon unlocks, and weapon level-ups.
+- HUD shows HP, level, XP, survival time, wave phase, enemy count, and weapon levels.
 
 ## Controls
 
