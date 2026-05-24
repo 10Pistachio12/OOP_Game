@@ -7,6 +7,7 @@
 
 #include "BatEnemy.hpp"
 #include "BruteEnemy.hpp"
+#include "EliteEnemy.hpp"
 #include "SlimeEnemy.hpp"
 #include "Util/Input.hpp"
 #include "Util/Keycode.hpp"
@@ -66,6 +67,13 @@ void GameScene::Update() {
     m_SurvivalTime += deltaTimeSeconds;
     m_EnemySpawnTimer -= deltaTimeSeconds;
 
+    if (m_SurvivalTime >= m_NextEliteSpawnTime) {
+        SpawnEliteWave();
+        ++m_EliteSpawnsCompleted;
+        m_NextEliteSpawnTime =
+            m_EnemyDirector->GetNextEliteSpawnTime(m_EliteSpawnsCompleted);
+    }
+
     if (m_EnemySpawnTimer <= 0.0F) {
         SpawnEnemyWave();
         m_EnemySpawnTimer = m_EnemyDirector->GetSpawnInterval(m_SurvivalTime);
@@ -103,6 +111,9 @@ void GameScene::Update() {
 void GameScene::Reset() {
     m_Status = Status::RUNNING;
     m_PendingLevelUps = 0;
+    m_KillCount = 0;
+    m_EliteKills = 0;
+    m_EliteSpawnsCompleted = 0;
     m_SurvivalTime = 0.0F;
     m_EnemySpawnTimer = 0.0F;
 
@@ -116,6 +127,8 @@ void GameScene::Reset() {
     m_Weapons = std::make_unique<WeaponInventory>(m_FontPath);
     m_Weapons->UnlockWeapon(WeaponType::MagicBolt);
     m_EnemyDirector = std::make_unique<EnemyDirector>(m_Rng);
+    m_NextEliteSpawnTime =
+        m_EnemyDirector->GetNextEliteSpawnTime(m_EliteSpawnsCompleted);
     m_UpgradeManager = std::make_unique<UpgradeManager>(m_Rng);
     m_UpgradeChoices.clear();
 
@@ -182,6 +195,10 @@ void GameScene::HandleDebugInput() {
     if (Util::Input::IsKeyDown(Util::Keycode::O)) {
         SpawnEnemyWave();
     }
+
+    if (Util::Input::IsKeyDown(Util::Keycode::P)) {
+        SpawnEliteWave();
+    }
 }
 
 void GameScene::GrantDebugLevelUp() {
@@ -237,6 +254,14 @@ void GameScene::SpawnEnemyWave() {
     }
 }
 
+void GameScene::SpawnEliteWave() {
+    const EnemySpawnRequest request =
+        m_EnemyDirector->CreateEliteSpawnRequest(m_SurvivalTime);
+    for (int i = 0; i < request.count; ++i) {
+        SpawnEnemy(request.type, request.difficultyScale);
+    }
+}
+
 void GameScene::SpawnEnemy(EnemyType enemyType, float difficultyScale) {
     const glm::vec2 spawnPosition = GenerateSpawnPosition();
 
@@ -248,6 +273,10 @@ void GameScene::SpawnEnemy(EnemyType enemyType, float difficultyScale) {
             break;
         case EnemyType::Brute:
             enemy = std::make_shared<BruteEnemy>(m_FontPath, spawnPosition,
+                                                 difficultyScale);
+            break;
+        case EnemyType::Elite:
+            enemy = std::make_shared<EliteEnemy>(m_FontPath, spawnPosition,
                                                  difficultyScale);
             break;
         case EnemyType::Slime:
@@ -295,6 +324,10 @@ void GameScene::HandleCollisions() {
             projectile->Destroy();
 
             if (!enemy->IsAlive()) {
+                ++m_KillCount;
+                if (enemy->IsElite()) {
+                    ++m_EliteKills;
+                }
                 SpawnExperienceGem(enemy->GetPosition(), enemy->GetExperienceValue());
             }
             break;
@@ -371,6 +404,10 @@ void GameScene::UpdateHud() const {
     stream << "Phase: " << m_EnemyDirector->GetPhaseName(m_SurvivalTime)
            << "  Magnet: " << static_cast<int>(m_Player->GetPickupRadius())
            << '\n';
+    stream << "Kills: " << m_KillCount << "  Elites: " << m_EliteKills
+           << "  Next Elite: "
+           << std::max(0, static_cast<int>(m_NextEliteSpawnTime - m_SurvivalTime))
+           << "s\n";
     stream << "Move: WASD / Arrow Keys  ESC: Exit";
 
     if (m_Status == Status::GAME_OVER) {
@@ -392,10 +429,11 @@ void GameScene::UpdateHud() const {
 #ifdef DEBUG_TOOLS_ENABLED
     if (m_ShowDebugHud) {
         stream << "\n[Debug] T: HUD  Y: Level Up  U: Unlock Nova  "
-               << "I: Weapon Lv  O: Wave";
+               << "I: Weapon Lv  O: Wave  P: Elite";
         stream << "\n[Debug] Projectiles: " << m_Projectiles.size()
                << "  Gems: " << m_ExperienceGems.size()
-               << "  Pending LevelUps: " << m_PendingLevelUps;
+               << "  Pending LevelUps: " << m_PendingLevelUps
+               << "  Elite Spawns: " << m_EliteSpawnsCompleted;
     } else {
         stream << "\n[Debug] Press T for test controls";
     }

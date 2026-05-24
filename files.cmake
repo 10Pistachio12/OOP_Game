@@ -5,6 +5,7 @@ set(SRC_FILES
     BruteEnemy.cpp
     Enemy.cpp
     EnemyDirector.cpp
+    EliteEnemy.cpp
     ExperienceGem.cpp
     GameScene.cpp
     GlyphObject.cpp
@@ -26,6 +27,7 @@ set(INCLUDE_FILES
     Character.hpp
     Enemy.hpp
     EnemyDirector.hpp
+    EliteEnemy.hpp
     ExperienceGem.hpp
     GameScene.hpp
     GlyphObject.hpp

@@ -38,6 +38,7 @@ private:
 #endif
     glm::vec2 GenerateSpawnPosition();
     void SpawnEnemyWave();
+    void SpawnEliteWave();
     void SpawnEnemy(EnemyType enemyType, float difficultyScale);
     void SpawnExperienceGem(const glm::vec2 &position, int value);
     void SpawnProjectiles(
@@ -61,8 +62,12 @@ private:
     Util::Renderer m_Renderer;
     Status m_Status = Status::RUNNING;
     int m_PendingLevelUps = 0;
+    int m_KillCount = 0;
+    int m_EliteKills = 0;
+    int m_EliteSpawnsCompleted = 0;
     float m_SurvivalTime = 0.0F;
     float m_EnemySpawnTimer = 0.0F;
+    float m_NextEliteSpawnTime = 25.0F;
 #ifdef DEBUG_TOOLS_ENABLED
     bool m_ShowDebugHud = false;
 #endif

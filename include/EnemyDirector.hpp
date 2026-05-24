@@ -9,6 +9,7 @@ enum class EnemyType {
     Slime,
     Bat,
     Brute,
+    Elite,
 };
 
 struct EnemySpawnRequest {
@@ -22,7 +23,9 @@ public:
     explicit EnemyDirector(std::mt19937 &rng);
 
     EnemySpawnRequest CreateSpawnRequest(float survivalTimeSeconds);
+    EnemySpawnRequest CreateEliteSpawnRequest(float survivalTimeSeconds);
     float GetSpawnInterval(float survivalTimeSeconds) const;
+    float GetNextEliteSpawnTime(int eliteSpawnsCompleted) const;
     std::string GetPhaseName(float survivalTimeSeconds) const;
 
 private:

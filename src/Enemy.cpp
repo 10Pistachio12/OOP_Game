@@ -5,12 +5,13 @@
 Enemy::Enemy(const std::string &fontPath, const std::string &glyph, int fontSize,
              const Util::Color &color, const glm::vec2 &spawnPosition,
              float radius, float moveSpeed, int hitPoints, int contactDamage,
-             int experienceValue, std::string enemyName)
+             int experienceValue, std::string enemyName, bool isElite)
     : Character(fontPath, glyph, fontSize, color, 5.0F, radius, moveSpeed,
                 hitPoints),
       m_ContactDamage(contactDamage),
       m_ExperienceValue(experienceValue),
-      m_EnemyName(std::move(enemyName)) {
+      m_EnemyName(std::move(enemyName)),
+      m_IsElite(isElite) {
     SetPosition(spawnPosition);
 }
 

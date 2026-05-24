@@ -12,17 +12,19 @@ public:
     int GetContactDamage() const { return m_ContactDamage; }
     int GetExperienceValue() const { return m_ExperienceValue; }
     const std::string &GetEnemyName() const { return m_EnemyName; }
+    bool IsElite() const { return m_IsElite; }
 
 protected:
     Enemy(const std::string &fontPath, const std::string &glyph, int fontSize,
           const Util::Color &color, const glm::vec2 &spawnPosition,
           float radius, float moveSpeed, int hitPoints, int contactDamage,
-          int experienceValue, std::string enemyName);
+          int experienceValue, std::string enemyName, bool isElite = false);
 
 private:
     int m_ContactDamage = 1;
     int m_ExperienceValue = 1;
     std::string m_EnemyName;
+    bool m_IsElite = false;
 };
 
 #endif

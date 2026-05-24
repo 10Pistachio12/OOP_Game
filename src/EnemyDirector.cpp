@@ -19,9 +19,22 @@ EnemySpawnRequest EnemyDirector::CreateSpawnRequest(float survivalTimeSeconds) {
     };
 }
 
+EnemySpawnRequest EnemyDirector::CreateEliteSpawnRequest(
+    float survivalTimeSeconds) {
+    return EnemySpawnRequest{
+        EnemyType::Elite,
+        survivalTimeSeconds >= 90.0F ? 2 : 1,
+        GetDifficultyScale(survivalTimeSeconds) * 1.2F,
+    };
+}
+
 float EnemyDirector::GetSpawnInterval(float survivalTimeSeconds) const {
     const float interval = 1.15F - survivalTimeSeconds * 0.015F;
     return std::max(0.24F, interval);
+}
+
+float EnemyDirector::GetNextEliteSpawnTime(int eliteSpawnsCompleted) const {
+    return 25.0F + static_cast<float>(eliteSpawnsCompleted) * 30.0F;
 }
 
 std::string EnemyDirector::GetPhaseName(float survivalTimeSeconds) const {

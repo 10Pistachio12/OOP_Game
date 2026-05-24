@@ -12,11 +12,11 @@ upgrades on level up.
 - The player starts with Magic Bolt and can unlock Arcane Nova through level-up choices.
 - Each weapon has levels and weapon-specific upgrade effects.
 - Auto-targeting Magic Bolt weapon and radial Arcane Nova burst weapon.
-- Slime, Bat, and Brute enemy classes derived from a shared Enemy base.
-- EnemyDirector controls timed phases, spawn rate, batch size, and enemy mix.
+- Slime, Bat, Brute, and Elite enemy classes derived from a shared Enemy base.
+- EnemyDirector controls timed phases, spawn rate, batch size, enemy mix, and timed elite spawns.
 - XP gems are magnetized toward the player within pickup range.
 - Level-up choices include character stats, all-weapon bonuses, weapon unlocks, and weapon level-ups.
-- HUD shows HP, level, XP, survival time, wave phase, enemy count, and weapon levels.
+- HUD shows HP, level, XP, survival time, wave phase, kills, elite countdown, and weapon levels.
 
 ## Controls
 
@@ -34,6 +34,7 @@ Debug builds enable test shortcuts for faster gameplay verification:
 - U: Unlock Arcane Nova
 - I: Level up all owned weapons
 - O: Spawn an enemy wave
+- P: Spawn an elite enemy wave
 
 ## Quick Start
 
