@@ -6,6 +6,7 @@
 #include <random>
 
 #include "Enemy.hpp"
+#include "EnemyDirector.hpp"
 #include "ExperienceGem.hpp"
 #include "Hud.hpp"
 #include "Player.hpp"
@@ -32,7 +33,8 @@ private:
     void EnterLevelUp();
     void HandleLevelUpInput();
     glm::vec2 GenerateSpawnPosition();
-    void SpawnEnemy();
+    void SpawnEnemyWave();
+    void SpawnEnemy(EnemyType enemyType, float difficultyScale);
     void SpawnExperienceGem(const glm::vec2 &position, int value);
     void SpawnProjectiles(
         const std::vector<std::shared_ptr<Projectile>> &projectiles);
@@ -46,6 +48,7 @@ private:
     std::shared_ptr<Player> m_Player;
     std::unique_ptr<Weapon> m_Weapon;
     std::mt19937 m_Rng;
+    std::unique_ptr<EnemyDirector> m_EnemyDirector;
     std::unique_ptr<UpgradeManager> m_UpgradeManager;
     std::vector<std::shared_ptr<Upgrade>> m_UpgradeChoices;
     std::vector<std::shared_ptr<Enemy>> m_Enemies;

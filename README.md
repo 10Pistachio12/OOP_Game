@@ -1,6 +1,26 @@
-# PTSD Template
+# OOP Vampire Survivors Prototype
 
-This is a [PTSD](https://github.com/ntut-open-source-club/practical-tools-for-simple-design) framework template for students taking OOPL2024s.
+This project is a C++ OOP game prototype built on the
+[PTSD](https://github.com/ntut-open-source-club/practical-tools-for-simple-design)
+framework. The current design follows the core loop of Vampire Survivors:
+move, survive enemy waves, auto-fire weapons, collect XP gems, and choose
+upgrades on level up.
+
+## Current Features
+
+- Auto-targeting Magic Bolt weapon.
+- Slime, Bat, and Brute enemy classes derived from a shared Enemy base.
+- EnemyDirector controls timed phases, spawn rate, batch size, and enemy mix.
+- XP gems are magnetized toward the player within pickup range.
+- Level-up upgrade choices for movement, health, pickup range, damage, and cooldown.
+- HUD shows HP, level, XP, survival time, wave phase, and enemy count.
+
+## Controls
+
+- Move: WASD or arrow keys
+- Choose upgrade: 1, 2, 3
+- Restart after game over: R
+- Exit: ESC
 
 ## Quick Start
 

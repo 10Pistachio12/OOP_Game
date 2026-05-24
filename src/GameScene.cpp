@@ -5,6 +5,7 @@
 #include <glm/geometric.hpp>
 
 #include "BatEnemy.hpp"
+#include "BruteEnemy.hpp"
 #include "MagicBoltWeapon.hpp"
 #include "SlimeEnemy.hpp"
 #include "Util/Input.hpp"
@@ -32,6 +33,7 @@ GameScene::GameScene()
       m_Player(std::make_shared<Player>(m_FontPath)),
       m_Weapon(std::make_unique<MagicBoltWeapon>(m_FontPath)),
       m_Rng(std::random_device{}()),
+      m_EnemyDirector(std::make_unique<EnemyDirector>(m_Rng)),
       m_UpgradeManager(std::make_unique<UpgradeManager>(m_Rng)) {}
 
 void GameScene::Start() {
@@ -61,8 +63,8 @@ void GameScene::Update() {
     m_EnemySpawnTimer -= deltaTimeSeconds;
 
     if (m_EnemySpawnTimer <= 0.0F) {
-        SpawnEnemy();
-        m_EnemySpawnTimer = std::max(0.35F, 1.15F - m_SurvivalTime * 0.025F);
+        SpawnEnemyWave();
+        m_EnemySpawnTimer = m_EnemyDirector->GetSpawnInterval(m_SurvivalTime);
     }
 
     m_Player->UpdateMovement(deltaTimeSeconds);
@@ -76,6 +78,13 @@ void GameScene::Update() {
     for (const auto &projectile : m_Projectiles) {
         if (projectile->IsAlive()) {
             projectile->Update(deltaTimeSeconds);
+        }
+    }
+
+    for (const auto &gem : m_ExperienceGems) {
+        if (gem->IsAlive()) {
+            gem->Update(deltaTimeSeconds, m_Player->GetPosition(),
+                        m_Player->GetPickupRadius());
         }
     }
 
@@ -101,6 +110,7 @@ void GameScene::Reset() {
     m_Player = std::make_shared<Player>(m_FontPath);
     m_Hud = std::make_shared<Hud>(m_FontPath);
     m_Weapon = std::make_unique<MagicBoltWeapon>(m_FontPath);
+    m_EnemyDirector = std::make_unique<EnemyDirector>(m_Rng);
     m_UpgradeManager = std::make_unique<UpgradeManager>(m_Rng);
     m_UpgradeChoices.clear();
 
@@ -176,19 +186,32 @@ glm::vec2 GameScene::GenerateSpawnPosition() {
     return spawnPosition;
 }
 
-void GameScene::SpawnEnemy() {
-    const float difficultyScale = 1.0F + m_SurvivalTime / 25.0F;
+void GameScene::SpawnEnemyWave() {
+    const EnemySpawnRequest request =
+        m_EnemyDirector->CreateSpawnRequest(m_SurvivalTime);
+    for (int i = 0; i < request.count; ++i) {
+        SpawnEnemy(request.type, request.difficultyScale);
+    }
+}
+
+void GameScene::SpawnEnemy(EnemyType enemyType, float difficultyScale) {
     const glm::vec2 spawnPosition = GenerateSpawnPosition();
 
     std::shared_ptr<Enemy> enemy;
-    const int enemyRoll = std::uniform_int_distribution<int>(0, 99)(m_Rng);
-    const bool canSpawnBats = m_SurvivalTime >= 10.0F;
-    if (canSpawnBats && enemyRoll < 35) {
-        enemy = std::make_shared<BatEnemy>(m_FontPath, spawnPosition,
-                                           difficultyScale);
-    } else {
-        enemy = std::make_shared<SlimeEnemy>(m_FontPath, spawnPosition,
-                                             difficultyScale);
+    switch (enemyType) {
+        case EnemyType::Bat:
+            enemy = std::make_shared<BatEnemy>(m_FontPath, spawnPosition,
+                                               difficultyScale);
+            break;
+        case EnemyType::Brute:
+            enemy = std::make_shared<BruteEnemy>(m_FontPath, spawnPosition,
+                                                 difficultyScale);
+            break;
+        case EnemyType::Slime:
+        default:
+            enemy = std::make_shared<SlimeEnemy>(m_FontPath, spawnPosition,
+                                                 difficultyScale);
+            break;
     }
 
     m_Enemies.push_back(enemy);
@@ -259,7 +282,7 @@ void GameScene::HandleCollisions() {
             continue;
         }
 
-        if (!IsColliding(m_Player->GetPosition(), m_Player->GetPickupRadius(),
+        if (!IsColliding(m_Player->GetPosition(), m_Player->GetRadius(),
                          gem->GetPosition(), gem->GetRadius())) {
             continue;
         }
@@ -302,6 +325,9 @@ void GameScene::UpdateHud() const {
            << m_Player->GetExperienceToNextLevel() << "  "
            << "Time: " << static_cast<int>(m_SurvivalTime) << "s  "
            << "Enemies: " << m_Enemies.size() << '\n';
+    stream << "Phase: " << m_EnemyDirector->GetPhaseName(m_SurvivalTime)
+           << "  Magnet: " << static_cast<int>(m_Player->GetPickupRadius())
+           << '\n';
     stream << "Move: WASD / Arrow Keys  ESC: Exit";
 
     if (m_Status == Status::GAME_OVER) {

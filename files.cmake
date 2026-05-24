@@ -1,7 +1,9 @@
 set(SRC_FILES
     App.cpp
     BatEnemy.cpp
+    BruteEnemy.cpp
     Enemy.cpp
+    EnemyDirector.cpp
     ExperienceGem.cpp
     GameScene.cpp
     GlyphObject.cpp
@@ -17,8 +19,10 @@ set(SRC_FILES
 set(INCLUDE_FILES
     App.hpp
     BatEnemy.hpp
+    BruteEnemy.hpp
     Character.hpp
     Enemy.hpp
+    EnemyDirector.hpp
     ExperienceGem.hpp
     GameScene.hpp
     GlyphObject.hpp
