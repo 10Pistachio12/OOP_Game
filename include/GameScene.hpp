@@ -32,6 +32,10 @@ private:
     void Reset();
     void EnterLevelUp();
     void HandleLevelUpInput();
+#ifdef DEBUG_TOOLS_ENABLED
+    void HandleDebugInput();
+    void GrantDebugLevelUp();
+#endif
     glm::vec2 GenerateSpawnPosition();
     void SpawnEnemyWave();
     void SpawnEnemy(EnemyType enemyType, float difficultyScale);
@@ -59,6 +63,9 @@ private:
     int m_PendingLevelUps = 0;
     float m_SurvivalTime = 0.0F;
     float m_EnemySpawnTimer = 0.0F;
+#ifdef DEBUG_TOOLS_ENABLED
+    bool m_ShowDebugHud = false;
+#endif
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "GameScene.hpp"
 
+#include <algorithm>
 #include <sstream>
 
 #include <glm/geometric.hpp>
@@ -41,6 +42,10 @@ void GameScene::Start() {
 
 void GameScene::Update() {
     const float deltaTimeSeconds = Util::Time::GetDeltaTimeMs() / 1000.0F;
+
+#ifdef DEBUG_TOOLS_ENABLED
+    HandleDebugInput();
+#endif
 
     if (m_Status == Status::LEVEL_UP) {
         HandleLevelUpInput();
@@ -155,6 +160,44 @@ void GameScene::HandleLevelUpInput() {
     m_UpgradeChoices.clear();
     m_Status = Status::RUNNING;
 }
+
+#ifdef DEBUG_TOOLS_ENABLED
+void GameScene::HandleDebugInput() {
+    if (Util::Input::IsKeyDown(Util::Keycode::T)) {
+        m_ShowDebugHud = !m_ShowDebugHud;
+    }
+
+    if (Util::Input::IsKeyDown(Util::Keycode::Y)) {
+        GrantDebugLevelUp();
+    }
+
+    if (Util::Input::IsKeyDown(Util::Keycode::U)) {
+        m_Weapons->UnlockWeapon(WeaponType::ArcaneNova);
+    }
+
+    if (Util::Input::IsKeyDown(Util::Keycode::I)) {
+        m_Weapons->LevelUpAllWeapons();
+    }
+
+    if (Util::Input::IsKeyDown(Util::Keycode::O)) {
+        SpawnEnemyWave();
+    }
+}
+
+void GameScene::GrantDebugLevelUp() {
+    const int neededExperience = std::max(
+        1, m_Player->GetExperienceToNextLevel() - m_Player->GetExperience());
+    const int levelUps = m_Player->GainExperience(neededExperience);
+    if (levelUps <= 0) {
+        return;
+    }
+
+    m_PendingLevelUps += levelUps;
+    if (m_Status == Status::RUNNING) {
+        EnterLevelUp();
+    }
+}
+#endif
 
 glm::vec2 GameScene::GenerateSpawnPosition() {
     glm::vec2 spawnPosition(0.0F);
@@ -345,6 +388,18 @@ void GameScene::UpdateHud() const {
     } else {
         stream << "\nAuto-fire is active. Collect XP gems to choose upgrades.";
     }
+
+#ifdef DEBUG_TOOLS_ENABLED
+    if (m_ShowDebugHud) {
+        stream << "\n[Debug] T: HUD  Y: Level Up  U: Unlock Nova  "
+               << "I: Weapon Lv  O: Wave";
+        stream << "\n[Debug] Projectiles: " << m_Projectiles.size()
+               << "  Gems: " << m_ExperienceGems.size()
+               << "  Pending LevelUps: " << m_PendingLevelUps;
+    } else {
+        stream << "\n[Debug] Press T for test controls";
+    }
+#endif
 
     m_Hud->SetContent(stream.str());
 }

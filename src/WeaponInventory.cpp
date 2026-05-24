@@ -43,6 +43,15 @@ bool WeaponInventory::LevelUpWeapon(WeaponType type) {
     return weapon->LevelUp();
 }
 
+bool WeaponInventory::LevelUpAllWeapons() {
+    bool didLevelUp = false;
+    for (const auto &weapon : m_Weapons) {
+        didLevelUp = weapon->LevelUp() || didLevelUp;
+    }
+
+    return didLevelUp;
+}
+
 bool WeaponInventory::HasWeapon(WeaponType type) const {
     return FindWeapon(type) != nullptr;
 }

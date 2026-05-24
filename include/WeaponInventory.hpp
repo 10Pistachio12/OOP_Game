@@ -16,6 +16,7 @@ public:
     void AddWeapon(std::unique_ptr<Weapon> weapon);
     bool UnlockWeapon(WeaponType type);
     bool LevelUpWeapon(WeaponType type);
+    bool LevelUpAllWeapons();
     bool HasWeapon(WeaponType type) const;
     bool CanLevelUpWeapon(WeaponType type) const;
     int GetWeaponLevel(WeaponType type) const;
