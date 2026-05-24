@@ -13,7 +13,7 @@
 #include "Projectile.hpp"
 #include "UpgradeManager.hpp"
 #include "Util/Renderer.hpp"
-#include "Weapon.hpp"
+#include "WeaponInventory.hpp"
 
 class GameScene {
 public:
@@ -46,7 +46,7 @@ private:
     std::string m_FontPath;
     mutable std::shared_ptr<Hud> m_Hud;
     std::shared_ptr<Player> m_Player;
-    std::unique_ptr<Weapon> m_Weapon;
+    std::unique_ptr<WeaponInventory> m_Weapons;
     std::mt19937 m_Rng;
     std::unique_ptr<EnemyDirector> m_EnemyDirector;
     std::unique_ptr<UpgradeManager> m_UpgradeManager;

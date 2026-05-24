@@ -4,6 +4,7 @@
 
 #include <glm/geometric.hpp>
 
+#include "ArcaneNovaWeapon.hpp"
 #include "BatEnemy.hpp"
 #include "BruteEnemy.hpp"
 #include "MagicBoltWeapon.hpp"
@@ -31,7 +32,7 @@ GameScene::GameScene()
     : m_FontPath(std::string(RESOURCE_DIR) + "/Inter.ttf"),
       m_Hud(std::make_shared<Hud>(m_FontPath)),
       m_Player(std::make_shared<Player>(m_FontPath)),
-      m_Weapon(std::make_unique<MagicBoltWeapon>(m_FontPath)),
+      m_Weapons(std::make_unique<WeaponInventory>()),
       m_Rng(std::random_device{}()),
       m_EnemyDirector(std::make_unique<EnemyDirector>(m_Rng)),
       m_UpgradeManager(std::make_unique<UpgradeManager>(m_Rng)) {}
@@ -89,7 +90,7 @@ void GameScene::Update() {
     }
 
     SpawnProjectiles(
-        m_Weapon->UpdateAndFire(*m_Player, m_Enemies, deltaTimeSeconds));
+        m_Weapons->UpdateAndFire(*m_Player, m_Enemies, deltaTimeSeconds));
     HandleCollisions();
     CleanupDestroyed();
     UpdateHud();
@@ -109,7 +110,9 @@ void GameScene::Reset() {
 
     m_Player = std::make_shared<Player>(m_FontPath);
     m_Hud = std::make_shared<Hud>(m_FontPath);
-    m_Weapon = std::make_unique<MagicBoltWeapon>(m_FontPath);
+    m_Weapons = std::make_unique<WeaponInventory>();
+    m_Weapons->AddWeapon(std::make_unique<MagicBoltWeapon>(m_FontPath));
+    m_Weapons->AddWeapon(std::make_unique<ArcaneNovaWeapon>(m_FontPath));
     m_EnemyDirector = std::make_unique<EnemyDirector>(m_Rng);
     m_UpgradeManager = std::make_unique<UpgradeManager>(m_Rng);
     m_UpgradeChoices.clear();
@@ -144,7 +147,7 @@ void GameScene::HandleLevelUpInput() {
     }
 
     m_UpgradeChoices[static_cast<std::size_t>(selectedIndex)]->Apply(
-        *m_Player, *m_Weapon);
+        *m_Player, *m_Weapons);
     --m_PendingLevelUps;
 
     if (m_PendingLevelUps > 0) {
@@ -318,7 +321,7 @@ void GameScene::CleanupDestroyed() {
 void GameScene::UpdateHud() const {
     std::ostringstream stream;
     stream << "Vampire Survivors MVP\n";
-    stream << "Weapon: " << m_Weapon->GetDisplayName() << "  "
+    stream << "Weapons: " << m_Weapons->GetDisplayNames() << "  "
            << "HP: " << m_Player->GetHitPoints() << "/" << m_Player->GetMaxHitPoints()
            << "  LV: " << m_Player->GetLevel() << '\n';
     stream << "XP: " << m_Player->GetExperience() << "/"

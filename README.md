@@ -8,11 +8,12 @@ upgrades on level up.
 
 ## Current Features
 
-- Auto-targeting Magic Bolt weapon.
+- WeaponInventory supports multiple automatic weapons.
+- Auto-targeting Magic Bolt weapon and radial Arcane Nova burst weapon.
 - Slime, Bat, and Brute enemy classes derived from a shared Enemy base.
 - EnemyDirector controls timed phases, spawn rate, batch size, and enemy mix.
 - XP gems are magnetized toward the player within pickup range.
-- Level-up upgrade choices for movement, health, pickup range, damage, and cooldown.
+- Level-up upgrade choices for movement, health, pickup range, all-weapon damage, and all-weapon cooldown.
 - HUD shows HP, level, XP, survival time, wave phase, and enemy count.
 
 ## Controls

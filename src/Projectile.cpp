@@ -4,8 +4,9 @@
 
 Projectile::Projectile(const std::string &fontPath, const glm::vec2 &spawnPosition,
                        const glm::vec2 &direction, float speed, int damage,
-                       float lifetimeSeconds)
-    : GlyphObject(fontPath, "*", 18, Util::Color(247, 222, 104), 7.0F, 10.0F),
+                       float lifetimeSeconds, std::string glyph, int fontSize,
+                       Util::Color color, float radius)
+    : GlyphObject(fontPath, glyph, fontSize, color, 7.0F, radius),
       m_Damage(damage),
       m_RemainingLifetime(lifetimeSeconds) {
     SetPosition(spawnPosition);

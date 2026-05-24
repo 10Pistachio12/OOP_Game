@@ -1,5 +1,6 @@
 set(SRC_FILES
     App.cpp
+    ArcaneNovaWeapon.cpp
     BatEnemy.cpp
     BruteEnemy.cpp
     Enemy.cpp
@@ -14,10 +15,12 @@ set(SRC_FILES
     SlimeEnemy.cpp
     Upgrade.cpp
     UpgradeManager.cpp
+    WeaponInventory.cpp
 )
 
 set(INCLUDE_FILES
     App.hpp
+    ArcaneNovaWeapon.hpp
     BatEnemy.hpp
     BruteEnemy.hpp
     Character.hpp
@@ -34,6 +37,7 @@ set(INCLUDE_FILES
     Upgrade.hpp
     UpgradeManager.hpp
     Weapon.hpp
+    WeaponInventory.hpp
 )
 
 set(TEST_FILES

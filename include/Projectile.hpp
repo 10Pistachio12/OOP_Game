@@ -7,7 +7,10 @@ class Projectile : public GlyphObject {
 public:
     Projectile(const std::string &fontPath, const glm::vec2 &spawnPosition,
                const glm::vec2 &direction, float speed, int damage,
-               float lifetimeSeconds);
+               float lifetimeSeconds, std::string glyph = "*",
+               int fontSize = 18,
+               Util::Color color = Util::Color(247, 222, 104),
+               float radius = 10.0F);
 
     void Update(float deltaTimeSeconds);
 
