@@ -3,14 +3,14 @@
 #include "config.hpp"
 
 Hud::Hud(const std::string &fontPath)
-    : m_Text(std::make_shared<Util::Text>(fontPath, 22, "",
+    : m_Text(std::make_shared<Util::Text>(fontPath, 22, "Loading",
                                           Util::Color(238, 238, 238))) {
     SetDrawable(m_Text);
     SetZIndex(100.0F);
 }
 
 void Hud::SetContent(const std::string &content) {
-    m_Text->SetText(content);
+    m_Text->SetText(content.empty() ? " " : content);
 
     const glm::vec2 size = m_Text->GetSize();
     m_Transform.translation = {
