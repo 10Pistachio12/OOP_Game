@@ -40,5 +40,7 @@ upgrades on level up.
    
    ```sh
    cmake -DCMAKE_BUILD_TYPE=Debug -B build # -G Ninja
+   cmake --build build -j 8
+   ./build/VampireSurvivors
    ```
    better read [PTSD README](https://github.com/ntut-open-source-club/practical-tools-for-simple-design)
