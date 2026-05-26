@@ -26,6 +26,7 @@ public:
     EnemySpawnRequest CreateEliteSpawnRequest(float survivalTimeSeconds);
     float GetSpawnInterval(float survivalTimeSeconds) const;
     float GetNextEliteSpawnTime(int eliteSpawnsCompleted) const;
+    int GetMaxActiveEnemies(float survivalTimeSeconds) const;
     std::string GetPhaseName(float survivalTimeSeconds) const;
 
 private:

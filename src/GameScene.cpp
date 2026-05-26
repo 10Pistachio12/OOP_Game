@@ -335,10 +335,25 @@ glm::vec2 GameScene::GenerateSpawnPosition() {
     return spawnPosition;
 }
 
+int GameScene::CountAliveEnemies() const {
+    return static_cast<int>(
+        std::count_if(m_Enemies.begin(), m_Enemies.end(),
+                      [](const auto &enemy) { return enemy->IsAlive(); }));
+}
+
 void GameScene::SpawnEnemyWave() {
+    const int maxActiveEnemies =
+        m_EnemyDirector->GetMaxActiveEnemies(m_SurvivalTime);
+    if (CountAliveEnemies() >= maxActiveEnemies) {
+        return;
+    }
+
     const EnemySpawnRequest request =
         m_EnemyDirector->CreateSpawnRequest(m_SurvivalTime);
     for (int i = 0; i < request.count; ++i) {
+        if (CountAliveEnemies() >= maxActiveEnemies) {
+            break;
+        }
         SpawnEnemy(request.type, request.difficultyScale);
     }
 }
@@ -570,6 +585,7 @@ void GameScene::UpdateHud() const {
            << '\n';
     stream << "Kills: " << m_KillCount << "  Elites: " << m_EliteKills
            << "  Chests: " << m_ChestsOpened
+           << "  Cap: " << m_EnemyDirector->GetMaxActiveEnemies(m_SurvivalTime)
            << "  Next Elite: "
            << std::max(0, static_cast<int>(m_NextEliteSpawnTime - m_SurvivalTime))
            << "s\n";

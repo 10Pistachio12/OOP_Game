@@ -44,6 +44,7 @@ private:
     void ForceDebugVictory();
 #endif
     glm::vec2 GenerateSpawnPosition();
+    int CountAliveEnemies() const;
     void SpawnEnemyWave();
     void SpawnEliteWave();
     void SpawnEnemy(EnemyType enemyType, float difficultyScale);
