@@ -52,6 +52,13 @@ public:
     void Apply(Player &player, WeaponInventory &weapons) const override;
 };
 
+class ProjectileCountUpgrade final : public Upgrade {
+public:
+    std::string GetName() const override { return "Twin Casting"; }
+    std::string GetDescription() const override { return "+1 projectile pattern to all weapons"; }
+    void Apply(Player &player, WeaponInventory &weapons) const override;
+};
+
 class UnlockWeaponUpgrade final : public Upgrade {
 public:
     explicit UnlockWeaponUpgrade(WeaponType weaponType);

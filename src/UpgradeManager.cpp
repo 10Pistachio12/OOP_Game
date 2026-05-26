@@ -15,6 +15,7 @@ std::vector<std::shared_ptr<Upgrade>> UpgradeManager::GenerateChoices(
         std::make_shared<PickupRangeUpgrade>(),
         std::make_shared<WeaponDamageUpgrade>(),
         std::make_shared<WeaponCooldownUpgrade>(),
+        std::make_shared<ProjectileCountUpgrade>(),
     };
 
     for (WeaponType type : weapons.GetOwnedWeaponTypes()) {
@@ -28,6 +29,8 @@ std::vector<std::shared_ptr<Upgrade>> UpgradeManager::GenerateChoices(
     }
 
     if (!weapons.HasWeapon(WeaponType::ArcaneNova)) {
+        pool.push_back(std::make_shared<UnlockWeaponUpgrade>(
+            WeaponType::ArcaneNova));
         pool.push_back(std::make_shared<UnlockWeaponUpgrade>(
             WeaponType::ArcaneNova));
     }

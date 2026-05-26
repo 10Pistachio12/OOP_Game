@@ -24,6 +24,10 @@ void WeaponCooldownUpgrade::Apply(Player &, WeaponInventory &weapons) const {
     weapons.MultiplyCooldown(0.86F);
 }
 
+void ProjectileCountUpgrade::Apply(Player &, WeaponInventory &weapons) const {
+    weapons.IncreaseProjectileCount(1);
+}
+
 UnlockWeaponUpgrade::UnlockWeaponUpgrade(WeaponType weaponType)
     : m_WeaponType(weaponType) {}
 

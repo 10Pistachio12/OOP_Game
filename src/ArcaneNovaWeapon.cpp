@@ -25,10 +25,11 @@ std::vector<std::shared_ptr<Projectile>> ArcaneNovaWeapon::UpdateAndFire(
         return spawnedProjectiles;
     }
 
-    for (int i = 0; i < m_ProjectilesPerBurst; ++i) {
+    const int projectileCount = m_ProjectilesPerBurst + m_BonusProjectileCount * 2;
+    for (int i = 0; i < projectileCount; ++i) {
         const float angle =
             m_BurstAngleOffset + TWO_PI * static_cast<float>(i) /
-                                     static_cast<float>(m_ProjectilesPerBurst);
+                                     static_cast<float>(projectileCount);
         const glm::vec2 direction{std::cos(angle), std::sin(angle)};
         spawnedProjectiles.push_back(std::make_shared<Projectile>(
             m_FontPath, owner.GetPosition(), direction, m_ProjectileSpeed,

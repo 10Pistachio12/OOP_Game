@@ -1,5 +1,7 @@
 #include "MagicBoltWeapon.hpp"
 
+#include <cmath>
+
 #include <glm/geometric.hpp>
 
 #include "Enemy.hpp"
@@ -7,7 +9,7 @@
 #include "Projectile.hpp"
 
 MagicBoltWeapon::MagicBoltWeapon(const std::string &fontPath)
-    : Weapon(WeaponType::MagicBolt, 0.6F, 5),
+    : Weapon(WeaponType::MagicBolt, 0.48F, 5),
       m_FontPath(fontPath) {}
 
 std::vector<std::shared_ptr<Projectile>> MagicBoltWeapon::UpdateAndFire(
@@ -39,10 +41,28 @@ std::vector<std::shared_ptr<Projectile>> MagicBoltWeapon::UpdateAndFire(
         return spawnedProjectiles;
     }
 
-    spawnedProjectiles.push_back(std::make_shared<Projectile>(
-        m_FontPath, owner.GetPosition(),
-        nearestEnemy->GetPosition() - owner.GetPosition(), m_ProjectileSpeed,
-        m_Damage, m_LifetimeSeconds));
+    glm::vec2 baseDirection = nearestEnemy->GetPosition() - owner.GetPosition();
+    if (glm::length(baseDirection) > 0.0F) {
+        baseDirection = glm::normalize(baseDirection);
+    }
+
+    const int projectileCount = 1 + m_BonusProjectileCount;
+    for (int i = 0; i < projectileCount; ++i) {
+        const float spreadStep = projectileCount == 1 ? 0.0F : 0.16F;
+        const float angleOffset =
+            (static_cast<float>(i) - static_cast<float>(projectileCount - 1) * 0.5F) *
+            spreadStep;
+        const float cosAngle = std::cos(angleOffset);
+        const float sinAngle = std::sin(angleOffset);
+        const glm::vec2 direction{
+            baseDirection.x * cosAngle - baseDirection.y * sinAngle,
+            baseDirection.x * sinAngle + baseDirection.y * cosAngle,
+        };
+
+        spawnedProjectiles.push_back(std::make_shared<Projectile>(
+            m_FontPath, owner.GetPosition(), direction, m_ProjectileSpeed,
+            m_Damage, m_LifetimeSeconds));
+    }
     m_CooldownRemaining = m_CooldownSeconds;
 
     return spawnedProjectiles;
@@ -53,7 +73,7 @@ std::string MagicBoltWeapon::GetLevelUpDescription() const {
         case 2:
             return "+1 damage";
         case 3:
-            return "-12% cooldown";
+            return "+1 projectile";
         case 4:
             return "+45 projectile speed and +0.2s lifetime";
         case 5:
@@ -69,7 +89,7 @@ void MagicBoltWeapon::ApplyLevelUp() {
             IncreaseDamage(1);
             break;
         case 3:
-            MultiplyCooldown(0.88F);
+            IncreaseProjectileCount(1);
             break;
         case 4:
             m_ProjectileSpeed += 45.0F;

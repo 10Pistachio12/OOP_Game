@@ -41,6 +41,9 @@ public:
     virtual void ApplyLevelUp() = 0;
     virtual void IncreaseDamage(int amount) = 0;
     virtual void MultiplyCooldown(float multiplier) = 0;
+    virtual void IncreaseProjectileCount(int amount) {
+        m_BonusProjectileCount += amount;
+    }
 
     bool LevelUp() {
         if (!CanLevelUp()) {
@@ -64,6 +67,7 @@ protected:
     float m_CooldownRemaining = 0.0F;
     int m_Level = 1;
     int m_MaxLevel = 1;
+    int m_BonusProjectileCount = 0;
 };
 
 #endif

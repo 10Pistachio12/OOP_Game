@@ -134,6 +134,12 @@ void WeaponInventory::MultiplyCooldown(float multiplier) {
     }
 }
 
+void WeaponInventory::IncreaseProjectileCount(int amount) {
+    for (const auto &weapon : m_Weapons) {
+        weapon->IncreaseProjectileCount(amount);
+    }
+}
+
 std::string WeaponInventory::GetDisplayNames() const {
     if (m_Weapons.empty()) {
         return "None";

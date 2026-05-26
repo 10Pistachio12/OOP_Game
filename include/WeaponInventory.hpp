@@ -34,6 +34,7 @@ public:
 
     void IncreaseDamage(int amount);
     void MultiplyCooldown(float multiplier);
+    void IncreaseProjectileCount(int amount);
 
     std::string GetDisplayNames() const;
     std::size_t GetWeaponCount() const { return m_Weapons.size(); }
