@@ -8,6 +8,7 @@ public:
     virtual ~Enemy() = default;
 
     virtual void Update(float deltaTimeSeconds, const glm::vec2 &targetPosition);
+    void TakeDamage(int amount) override;
 
     int GetContactDamage() const { return m_ContactDamage; }
     int GetExperienceValue() const { return m_ExperienceValue; }
@@ -24,11 +25,14 @@ protected:
           int hitPoints, int contactDamage, int experienceValue,
           std::string enemyName, bool isElite = false);
 
+    void UpdateHitFlash(float deltaTimeSeconds);
+
 private:
     int m_ContactDamage = 1;
     int m_ExperienceValue = 1;
     std::string m_EnemyName;
     bool m_IsElite = false;
+    float m_HitFlashTimer = 0.0F;
 };
 
 #endif

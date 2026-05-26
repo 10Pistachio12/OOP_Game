@@ -16,6 +16,7 @@ BatEnemy::BatEnemy(const std::string &fontPath, const glm::vec2 &spawnPosition,
 }
 
 void BatEnemy::Update(float deltaTimeSeconds, const glm::vec2 &targetPosition) {
+    UpdateHitFlash(deltaTimeSeconds);
     m_DriftTimer += deltaTimeSeconds;
 
     glm::vec2 direction = targetPosition - GetPosition();

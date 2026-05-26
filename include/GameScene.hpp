@@ -8,6 +8,7 @@
 #include "Enemy.hpp"
 #include "EnemyDirector.hpp"
 #include "ExperienceGem.hpp"
+#include "FloatingText.hpp"
 #include "Hud.hpp"
 #include "Player.hpp"
 #include "Projectile.hpp"
@@ -52,6 +53,10 @@ private:
     void SpawnRewardChest(const glm::vec2 &position);
     void SpawnProjectiles(
         const std::vector<std::shared_ptr<Projectile>> &projectiles);
+    void SpawnFloatingText(const std::string &content,
+                           const glm::vec2 &position,
+                           const Util::Color &color,
+                           float lifetimeSeconds = 0.75F);
     void OpenRewardChest(const std::shared_ptr<RewardChest> &chest);
     void HandleCollisions();
     void CleanupDestroyed();
@@ -70,6 +75,7 @@ private:
     std::vector<std::shared_ptr<Projectile>> m_Projectiles;
     std::vector<std::shared_ptr<ExperienceGem>> m_ExperienceGems;
     std::vector<std::shared_ptr<RewardChest>> m_RewardChests;
+    std::vector<std::shared_ptr<FloatingText>> m_FloatingTexts;
     Util::Renderer m_Renderer;
     Status m_Status = Status::TITLE;
     int m_PendingLevelUps = 0;

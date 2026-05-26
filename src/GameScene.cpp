@@ -137,6 +137,12 @@ void GameScene::Update() {
         }
     }
 
+    for (const auto &text : m_FloatingTexts) {
+        if (text->IsAlive()) {
+            text->Update(deltaTimeSeconds);
+        }
+    }
+
     SpawnProjectiles(
         m_Weapons->UpdateAndFire(*m_Player, m_Enemies, deltaTimeSeconds));
     HandleCollisions();
@@ -163,6 +169,7 @@ void GameScene::ShowTitleScreen() {
     m_Projectiles.clear();
     m_ExperienceGems.clear();
     m_RewardChests.clear();
+    m_FloatingTexts.clear();
     m_UpgradeChoices.clear();
 
     m_Hud = std::make_shared<Hud>(m_FontPath);
@@ -186,6 +193,7 @@ void GameScene::Reset() {
     m_Projectiles.clear();
     m_ExperienceGems.clear();
     m_RewardChests.clear();
+    m_FloatingTexts.clear();
 
     m_Player = std::make_shared<Player>(m_FontPath);
     m_Hud = std::make_shared<Hud>(m_FontPath);
@@ -226,8 +234,10 @@ void GameScene::HandleLevelUpInput() {
         return;
     }
 
-    m_UpgradeChoices[static_cast<std::size_t>(selectedIndex)]->Apply(
-        *m_Player, *m_Weapons);
+    const auto selectedChoice =
+        m_UpgradeChoices[static_cast<std::size_t>(selectedIndex)];
+    const std::string selectedName = selectedChoice->GetName();
+    selectedChoice->Apply(*m_Player, *m_Weapons);
     --m_PendingLevelUps;
 
     if (m_PendingLevelUps > 0) {
@@ -237,6 +247,9 @@ void GameScene::HandleLevelUpInput() {
 
     m_UpgradeChoices.clear();
     m_Status = Status::RUNNING;
+    SpawnFloatingText(selectedName,
+                      m_Player->GetPosition() + glm::vec2(0.0F, 34.0F),
+                      Util::Color(255, 230, 110), 1.1F);
 }
 
 void GameScene::HandleEndScreenInput() {
@@ -414,6 +427,22 @@ void GameScene::SpawnProjectiles(
     }
 }
 
+void GameScene::SpawnFloatingText(const std::string &content,
+                                  const glm::vec2 &position,
+                                  const Util::Color &color,
+                                  float lifetimeSeconds) {
+    if (m_FloatingTexts.size() >= 32) {
+        m_Renderer.RemoveChild(m_FloatingTexts.front());
+        m_FloatingTexts.erase(m_FloatingTexts.begin());
+    }
+
+    auto text =
+        std::make_shared<FloatingText>(m_FontPath, content, color, position,
+                                       lifetimeSeconds);
+    m_FloatingTexts.push_back(text);
+    m_Renderer.AddChild(text);
+}
+
 void GameScene::OpenRewardChest(const std::shared_ptr<RewardChest> &chest) {
     if (!chest->IsAlive()) {
         return;
@@ -422,10 +451,14 @@ void GameScene::OpenRewardChest(const std::shared_ptr<RewardChest> &chest) {
     const std::string weaponReward = m_Weapons->LevelUpRandomWeapon(m_Rng);
     if (!weaponReward.empty()) {
         m_LastRewardText = "Chest Reward: " + weaponReward;
+        SpawnFloatingText("Chest: " + weaponReward, chest->GetPosition(),
+                          Util::Color(255, 220, 80), 1.2F);
     } else {
         m_Player->Heal(2);
         const int levelUps = m_Player->GainExperience(8);
         m_LastRewardText = "Chest Reward: +8 XP and heal 2";
+        SpawnFloatingText("+8 XP  +2 HP", chest->GetPosition(),
+                          Util::Color(255, 220, 80), 1.2F);
         if (levelUps > 0 && m_Status == Status::RUNNING) {
             m_PendingLevelUps += levelUps;
             EnterLevelUp();
@@ -454,12 +487,17 @@ void GameScene::HandleCollisions() {
 
             enemy->TakeDamage(projectile->GetDamage());
             projectile->Destroy();
+            SpawnFloatingText("-" + std::to_string(projectile->GetDamage()),
+                              enemy->GetPosition() + glm::vec2(0.0F, 18.0F),
+                              Util::Color(255, 120, 95), 0.55F);
 
             if (!enemy->IsAlive()) {
                 ++m_KillCount;
                 if (enemy->IsElite()) {
                     ++m_EliteKills;
                     SpawnRewardChest(enemy->GetPosition());
+                    SpawnFloatingText("Chest!", enemy->GetPosition(),
+                                      Util::Color(255, 220, 80), 0.9F);
                 }
                 SpawnExperienceGem(enemy->GetPosition(), enemy->GetExperienceValue());
             }
@@ -479,6 +517,9 @@ void GameScene::HandleCollisions() {
 
         m_Player->TakeDamage(enemy->GetContactDamage());
         enemy->Destroy();
+        SpawnFloatingText("-" + std::to_string(enemy->GetContactDamage()) + " HP",
+                          m_Player->GetPosition() + glm::vec2(0.0F, 28.0F),
+                          Util::Color(255, 95, 95), 0.75F);
 
         if (!m_Player->IsAlive()) {
             m_Status = Status::GAME_OVER;
@@ -497,6 +538,9 @@ void GameScene::HandleCollisions() {
         }
 
         const int levelUps = m_Player->GainExperience(gem->GetValue());
+        SpawnFloatingText("+" + std::to_string(gem->GetValue()) + " XP",
+                          gem->GetPosition(), Util::Color(100, 225, 255),
+                          0.55F);
         if (levelUps > 0 && m_Status == Status::RUNNING) {
             m_PendingLevelUps += levelUps;
             EnterLevelUp();
@@ -536,6 +580,7 @@ void GameScene::CleanupDestroyed() {
     removeDestroyed(m_Enemies);
     removeDestroyed(m_ExperienceGems);
     removeDestroyed(m_RewardChests);
+    removeDestroyed(m_FloatingTexts);
 }
 
 void GameScene::UpdateHud() const {
@@ -617,6 +662,7 @@ void GameScene::UpdateHud() const {
         stream << "\n[Debug] Projectiles: " << m_Projectiles.size()
                << "  Gems: " << m_ExperienceGems.size()
                << "  Chests: " << m_RewardChests.size()
+               << "  Texts: " << m_FloatingTexts.size()
                << "  Pending LevelUps: " << m_PendingLevelUps
                << "  Elite Spawns: " << m_EliteSpawnsCompleted;
     } else {
