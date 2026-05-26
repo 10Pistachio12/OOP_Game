@@ -2,10 +2,14 @@
 
 #include <glm/geometric.hpp>
 
+#include "SpriteAssets.hpp"
+
 ExperienceGem::ExperienceGem(const std::string &fontPath,
                              const glm::vec2 &spawnPosition, int value)
-    : GlyphObject(fontPath, "+", 18, Util::Color(80, 215, 255), 4.0F, 12.0F),
+    : GlyphObject(SpriteAssets::Path("gem.png"), {0.7F, 0.7F}, 4.0F, 12.0F),
       m_Value(value) {
+    (void)fontPath;
+
     SetPosition(spawnPosition);
 }
 

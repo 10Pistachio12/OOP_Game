@@ -3,6 +3,7 @@
 #include <glm/common.hpp>
 #include <glm/geometric.hpp>
 
+#include "SpriteAssets.hpp"
 #include "Util/Input.hpp"
 #include "Util/Keycode.hpp"
 #include "config.hpp"
@@ -12,8 +13,10 @@ constexpr float PLAYER_MARGIN = 36.0F;
 }
 
 Player::Player(const std::string &fontPath)
-    : Character(fontPath, "@", 34, Util::Color(127, 235, 127), 10.0F, 18.0F,
-                260.0F, 8) {}
+    : Character(SpriteAssets::Path("player.png"), {1.1F, 1.1F}, 10.0F, 18.0F,
+                260.0F, 8) {
+    (void)fontPath;
+}
 
 void Player::UpdateMovement(float deltaTimeSeconds) {
     glm::vec2 direction(0.0F);

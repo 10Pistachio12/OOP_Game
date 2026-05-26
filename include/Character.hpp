@@ -13,6 +13,13 @@ public:
           m_HitPoints(hitPoints),
           m_MaxHitPoints(hitPoints) {}
 
+    Character(const std::string &imagePath, const glm::vec2 &scale,
+              float zIndex, float radius, float moveSpeed, int hitPoints)
+        : GlyphObject(imagePath, scale, zIndex, radius),
+          m_MoveSpeed(moveSpeed),
+          m_HitPoints(hitPoints),
+          m_MaxHitPoints(hitPoints) {}
+
     float GetMoveSpeed() const { return m_MoveSpeed; }
     int GetHitPoints() const { return m_HitPoints; }
     int GetMaxHitPoints() const { return m_MaxHitPoints; }

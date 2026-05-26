@@ -13,6 +13,7 @@ upgrades on level up.
 - Each weapon has levels and weapon-specific upgrade effects.
 - Auto-targeting Magic Bolt weapon and radial Arcane Nova burst weapon.
 - Early power growth includes projectile-count upgrades for stronger clearing.
+- Placeholder sprites are used for the player, enemies, projectiles, gems, and chests.
 - Slime, Bat, Brute, and Elite enemy classes derived from a shared Enemy base.
 - EnemyDirector controls timed phases, spawn rate, batch size, enemy mix, and timed elite spawns.
 - Elite enemies drop reward chests that upgrade a random owned weapon.

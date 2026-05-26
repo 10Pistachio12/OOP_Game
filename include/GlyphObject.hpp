@@ -4,6 +4,7 @@
 #include "pch.hpp"
 
 #include "Util/GameObject.hpp"
+#include "Util/Image.hpp"
 #include "Util/Text.hpp"
 
 class GlyphObject : public Util::GameObject {
@@ -11,6 +12,8 @@ public:
     GlyphObject(const std::string &fontPath, const std::string &glyph,
                 int fontSize, const Util::Color &color, float zIndex,
                 float radius);
+    GlyphObject(const std::string &imagePath, const glm::vec2 &scale,
+                float zIndex, float radius);
 
     glm::vec2 GetPosition() const { return m_Transform.translation; }
     float GetRadius() const { return m_Radius; }
@@ -20,6 +23,7 @@ public:
     void Destroy() { m_IsAlive = false; }
 
 protected:
+    std::shared_ptr<Util::Image> m_Image;
     std::shared_ptr<Util::Text> m_Text;
     float m_Radius = 0.0F;
     bool m_IsAlive = true;

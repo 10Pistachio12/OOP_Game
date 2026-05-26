@@ -38,6 +38,7 @@ set(INCLUDE_FILES
     Projectile.hpp
     RewardChest.hpp
     SlimeEnemy.hpp
+    SpriteAssets.hpp
     Upgrade.hpp
     UpgradeManager.hpp
     Weapon.hpp

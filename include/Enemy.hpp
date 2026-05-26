@@ -19,6 +19,10 @@ protected:
           const Util::Color &color, const glm::vec2 &spawnPosition,
           float radius, float moveSpeed, int hitPoints, int contactDamage,
           int experienceValue, std::string enemyName, bool isElite = false);
+    Enemy(const std::string &imagePath, const glm::vec2 &scale,
+          const glm::vec2 &spawnPosition, float radius, float moveSpeed,
+          int hitPoints, int contactDamage, int experienceValue,
+          std::string enemyName, bool isElite = false);
 
 private:
     int m_ContactDamage = 1;
