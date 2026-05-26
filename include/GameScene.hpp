@@ -24,17 +24,23 @@ public:
 
 private:
     enum class Status {
+        TITLE,
         RUNNING,
+        PAUSED,
         LEVEL_UP,
         GAME_OVER,
+        VICTORY,
     };
 
+    void ShowTitleScreen();
     void Reset();
     void EnterLevelUp();
     void HandleLevelUpInput();
+    void HandleEndScreenInput();
 #ifdef DEBUG_TOOLS_ENABLED
     void HandleDebugInput();
     void GrantDebugLevelUp();
+    void ForceDebugVictory();
 #endif
     glm::vec2 GenerateSpawnPosition();
     void SpawnEnemyWave();
@@ -60,7 +66,7 @@ private:
     std::vector<std::shared_ptr<Projectile>> m_Projectiles;
     std::vector<std::shared_ptr<ExperienceGem>> m_ExperienceGems;
     Util::Renderer m_Renderer;
-    Status m_Status = Status::RUNNING;
+    Status m_Status = Status::TITLE;
     int m_PendingLevelUps = 0;
     int m_KillCount = 0;
     int m_EliteKills = 0;

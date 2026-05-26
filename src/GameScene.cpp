@@ -17,6 +17,7 @@
 namespace {
 constexpr float HALF_WIDTH = static_cast<float>(WINDOW_WIDTH) * 0.5F;
 constexpr float HALF_HEIGHT = static_cast<float>(WINDOW_HEIGHT) * 0.5F;
+constexpr float VICTORY_TIME_SECONDS = 180.0F;
 
 float RandomRange(std::mt19937 &rng, float minValue, float maxValue) {
     return std::uniform_real_distribution<float>(minValue, maxValue)(rng);
@@ -38,14 +39,35 @@ GameScene::GameScene()
       m_UpgradeManager(std::make_unique<UpgradeManager>(m_Rng)) {}
 
 void GameScene::Start() {
-    Reset();
+    ShowTitleScreen();
 }
 
 void GameScene::Update() {
     const float deltaTimeSeconds = Util::Time::GetDeltaTimeMs() / 1000.0F;
 
+    if (m_Status == Status::TITLE) {
+        if (Util::Input::IsKeyDown(Util::Keycode::RETURN)) {
+            Reset();
+        }
+        UpdateHud();
+        m_Renderer.Update();
+        return;
+    }
+
+    if (m_Status == Status::GAME_OVER || m_Status == Status::VICTORY) {
+        HandleEndScreenInput();
+        UpdateHud();
+        m_Renderer.Update();
+        return;
+    }
+
 #ifdef DEBUG_TOOLS_ENABLED
     HandleDebugInput();
+    if (m_Status == Status::VICTORY) {
+        UpdateHud();
+        m_Renderer.Update();
+        return;
+    }
 #endif
 
     if (m_Status == Status::LEVEL_UP) {
@@ -55,16 +77,31 @@ void GameScene::Update() {
         return;
     }
 
-    if (m_Status == Status::GAME_OVER) {
-        if (Util::Input::IsKeyDown(Util::Keycode::R)) {
-            Reset();
+    if (m_Status == Status::PAUSED) {
+        if (Util::Input::IsKeyDown(Util::Keycode::SPACE)) {
+            m_Status = Status::RUNNING;
         }
         UpdateHud();
         m_Renderer.Update();
         return;
     }
 
+    if (Util::Input::IsKeyDown(Util::Keycode::SPACE)) {
+        m_Status = Status::PAUSED;
+        UpdateHud();
+        m_Renderer.Update();
+        return;
+    }
+
     m_SurvivalTime += deltaTimeSeconds;
+
+    if (m_SurvivalTime >= VICTORY_TIME_SECONDS) {
+        m_Status = Status::VICTORY;
+        UpdateHud();
+        m_Renderer.Update();
+        return;
+    }
+
     m_EnemySpawnTimer -= deltaTimeSeconds;
 
     if (m_SurvivalTime >= m_NextEliteSpawnTime) {
@@ -106,6 +143,28 @@ void GameScene::Update() {
     CleanupDestroyed();
     UpdateHud();
     m_Renderer.Update();
+}
+
+void GameScene::ShowTitleScreen() {
+    m_Status = Status::TITLE;
+    m_PendingLevelUps = 0;
+    m_KillCount = 0;
+    m_EliteKills = 0;
+    m_EliteSpawnsCompleted = 0;
+    m_SurvivalTime = 0.0F;
+    m_EnemySpawnTimer = 0.0F;
+    m_NextEliteSpawnTime =
+        m_EnemyDirector->GetNextEliteSpawnTime(m_EliteSpawnsCompleted);
+
+    m_Renderer = Util::Renderer();
+    m_Enemies.clear();
+    m_Projectiles.clear();
+    m_ExperienceGems.clear();
+    m_UpgradeChoices.clear();
+
+    m_Hud = std::make_shared<Hud>(m_FontPath);
+    m_Renderer.AddChild(m_Hud);
+    UpdateHud();
 }
 
 void GameScene::Reset() {
@@ -174,6 +233,17 @@ void GameScene::HandleLevelUpInput() {
     m_Status = Status::RUNNING;
 }
 
+void GameScene::HandleEndScreenInput() {
+    if (Util::Input::IsKeyDown(Util::Keycode::R)) {
+        Reset();
+        return;
+    }
+
+    if (Util::Input::IsKeyDown(Util::Keycode::RETURN)) {
+        ShowTitleScreen();
+    }
+}
+
 #ifdef DEBUG_TOOLS_ENABLED
 void GameScene::HandleDebugInput() {
     if (Util::Input::IsKeyDown(Util::Keycode::T)) {
@@ -199,6 +269,10 @@ void GameScene::HandleDebugInput() {
     if (Util::Input::IsKeyDown(Util::Keycode::P)) {
         SpawnEliteWave();
     }
+
+    if (Util::Input::IsKeyDown(Util::Keycode::V)) {
+        ForceDebugVictory();
+    }
 }
 
 void GameScene::GrantDebugLevelUp() {
@@ -213,6 +287,11 @@ void GameScene::GrantDebugLevelUp() {
     if (m_Status == Status::RUNNING) {
         EnterLevelUp();
     }
+}
+
+void GameScene::ForceDebugVictory() {
+    m_SurvivalTime = VICTORY_TIME_SECONDS;
+    m_Status = Status::VICTORY;
 }
 #endif
 
@@ -393,6 +472,36 @@ void GameScene::CleanupDestroyed() {
 
 void GameScene::UpdateHud() const {
     std::ostringstream stream;
+
+    if (m_Status == Status::TITLE) {
+        stream << "Vampire Survivors\n\n";
+        stream << "Survive " << static_cast<int>(VICTORY_TIME_SECONDS)
+               << " seconds against escalating enemy waves.\n";
+        stream << "Press Enter to Start\n\n";
+        stream << "Move: WASD / Arrow Keys\n";
+        stream << "Choose upgrades: 1 / 2 / 3\n";
+        stream << "Pause: Space  Exit: ESC";
+#ifdef DEBUG_TOOLS_ENABLED
+        stream << "\n\nDebug build: T shows test controls after starting.";
+#endif
+        m_Hud->SetContent(stream.str());
+        return;
+    }
+
+    if (m_Status == Status::GAME_OVER || m_Status == Status::VICTORY) {
+        stream << (m_Status == Status::VICTORY ? "Victory" : "Game Over")
+               << "\n\n";
+        stream << "Survival Time: " << static_cast<int>(m_SurvivalTime) << " / "
+               << static_cast<int>(VICTORY_TIME_SECONDS) << "s\n";
+        stream << "Level: " << m_Player->GetLevel()
+               << "  Kills: " << m_KillCount
+               << "  Elites: " << m_EliteKills << '\n';
+        stream << "Weapons: " << m_Weapons->GetDisplayNames() << "\n\n";
+        stream << "R: Restart  Enter: Title  ESC: Exit";
+        m_Hud->SetContent(stream.str());
+        return;
+    }
+
     stream << "Vampire Survivors MVP\n";
     stream << "Weapons: " << m_Weapons->GetDisplayNames() << "  "
            << "HP: " << m_Player->GetHitPoints() << "/" << m_Player->GetMaxHitPoints()
@@ -408,10 +517,12 @@ void GameScene::UpdateHud() const {
            << "  Next Elite: "
            << std::max(0, static_cast<int>(m_NextEliteSpawnTime - m_SurvivalTime))
            << "s\n";
-    stream << "Move: WASD / Arrow Keys  ESC: Exit";
+    stream << "Move: WASD / Arrow Keys  Space: Pause  ESC: Exit";
 
     if (m_Status == Status::GAME_OVER) {
         stream << "\nGame Over - Press R to Restart";
+    } else if (m_Status == Status::PAUSED) {
+        stream << "\nPaused - Press Space to Resume";
     } else if (m_Status == Status::LEVEL_UP) {
         stream << "\nChoose an upgrade";
         if (m_PendingLevelUps > 1) {
@@ -429,7 +540,7 @@ void GameScene::UpdateHud() const {
 #ifdef DEBUG_TOOLS_ENABLED
     if (m_ShowDebugHud) {
         stream << "\n[Debug] T: HUD  Y: Level Up  U: Unlock Nova  "
-               << "I: Weapon Lv  O: Wave  P: Elite";
+               << "I: Weapon Lv  O: Wave  P: Elite  V: Victory";
         stream << "\n[Debug] Projectiles: " << m_Projectiles.size()
                << "  Gems: " << m_ExperienceGems.size()
                << "  Pending LevelUps: " << m_PendingLevelUps

@@ -17,11 +17,14 @@ upgrades on level up.
 - XP gems are magnetized toward the player within pickup range.
 - Level-up choices include character stats, all-weapon bonuses, weapon unlocks, and weapon level-ups.
 - HUD shows HP, level, XP, survival time, wave phase, kills, elite countdown, and weapon levels.
+- Title, pause, victory, game-over, and run-result screens.
 
 ## Controls
 
 - Move: WASD or arrow keys
 - Choose upgrade: 1, 2, 3
+- Start / return to title: Enter
+- Pause / resume: Space
 - Restart after game over: R
 - Exit: ESC
 
@@ -35,6 +38,7 @@ Debug builds enable test shortcuts for faster gameplay verification:
 - I: Level up all owned weapons
 - O: Spawn an enemy wave
 - P: Spawn an elite enemy wave
+- V: Force victory result screen
 
 ## Quick Start
 
