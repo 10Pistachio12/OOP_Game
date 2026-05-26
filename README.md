@@ -14,6 +14,7 @@ upgrades on level up.
 - Auto-targeting Magic Bolt weapon and radial Arcane Nova burst weapon.
 - Slime, Bat, Brute, and Elite enemy classes derived from a shared Enemy base.
 - EnemyDirector controls timed phases, spawn rate, batch size, enemy mix, and timed elite spawns.
+- Elite enemies drop reward chests that upgrade a random owned weapon.
 - XP gems are magnetized toward the player within pickup range.
 - Level-up choices include character stats, all-weapon bonuses, weapon unlocks, and weapon level-ups.
 - HUD shows HP, level, XP, survival time, wave phase, kills, elite countdown, and weapon levels.
@@ -38,6 +39,7 @@ Debug builds enable test shortcuts for faster gameplay verification:
 - I: Level up all owned weapons
 - O: Spawn an enemy wave
 - P: Spawn an elite enemy wave
+- C: Spawn a reward chest
 - V: Force victory result screen
 
 ## Quick Start

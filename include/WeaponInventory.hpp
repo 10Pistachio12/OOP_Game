@@ -3,6 +3,8 @@
 
 #include "pch.hpp"
 
+#include <random>
+
 #include "Weapon.hpp"
 
 class Enemy;
@@ -16,6 +18,7 @@ public:
     void AddWeapon(std::unique_ptr<Weapon> weapon);
     bool UnlockWeapon(WeaponType type);
     bool LevelUpWeapon(WeaponType type);
+    std::string LevelUpRandomWeapon(std::mt19937 &rng);
     bool LevelUpAllWeapons();
     bool HasWeapon(WeaponType type) const;
     bool CanLevelUpWeapon(WeaponType type) const;

@@ -151,8 +151,10 @@ void GameScene::ShowTitleScreen() {
     m_KillCount = 0;
     m_EliteKills = 0;
     m_EliteSpawnsCompleted = 0;
+    m_ChestsOpened = 0;
     m_SurvivalTime = 0.0F;
     m_EnemySpawnTimer = 0.0F;
+    m_LastRewardText = "None";
     m_NextEliteSpawnTime =
         m_EnemyDirector->GetNextEliteSpawnTime(m_EliteSpawnsCompleted);
 
@@ -160,6 +162,7 @@ void GameScene::ShowTitleScreen() {
     m_Enemies.clear();
     m_Projectiles.clear();
     m_ExperienceGems.clear();
+    m_RewardChests.clear();
     m_UpgradeChoices.clear();
 
     m_Hud = std::make_shared<Hud>(m_FontPath);
@@ -173,13 +176,16 @@ void GameScene::Reset() {
     m_KillCount = 0;
     m_EliteKills = 0;
     m_EliteSpawnsCompleted = 0;
+    m_ChestsOpened = 0;
     m_SurvivalTime = 0.0F;
     m_EnemySpawnTimer = 0.0F;
+    m_LastRewardText = "None";
 
     m_Renderer = Util::Renderer();
     m_Enemies.clear();
     m_Projectiles.clear();
     m_ExperienceGems.clear();
+    m_RewardChests.clear();
 
     m_Player = std::make_shared<Player>(m_FontPath);
     m_Hud = std::make_shared<Hud>(m_FontPath);
@@ -268,6 +274,10 @@ void GameScene::HandleDebugInput() {
 
     if (Util::Input::IsKeyDown(Util::Keycode::P)) {
         SpawnEliteWave();
+    }
+
+    if (Util::Input::IsKeyDown(Util::Keycode::C)) {
+        SpawnRewardChest(m_Player->GetPosition());
     }
 
     if (Util::Input::IsKeyDown(Util::Keycode::V)) {
@@ -375,12 +385,40 @@ void GameScene::SpawnExperienceGem(const glm::vec2 &position, int value) {
     m_Renderer.AddChild(gem);
 }
 
+void GameScene::SpawnRewardChest(const glm::vec2 &position) {
+    auto chest = std::make_shared<RewardChest>(m_FontPath, position);
+    m_RewardChests.push_back(chest);
+    m_Renderer.AddChild(chest);
+}
+
 void GameScene::SpawnProjectiles(
     const std::vector<std::shared_ptr<Projectile>> &projectiles) {
     for (const auto &projectile : projectiles) {
         m_Projectiles.push_back(projectile);
         m_Renderer.AddChild(projectile);
     }
+}
+
+void GameScene::OpenRewardChest(const std::shared_ptr<RewardChest> &chest) {
+    if (!chest->IsAlive()) {
+        return;
+    }
+
+    const std::string weaponReward = m_Weapons->LevelUpRandomWeapon(m_Rng);
+    if (!weaponReward.empty()) {
+        m_LastRewardText = "Chest Reward: " + weaponReward;
+    } else {
+        m_Player->Heal(2);
+        const int levelUps = m_Player->GainExperience(8);
+        m_LastRewardText = "Chest Reward: +8 XP and heal 2";
+        if (levelUps > 0 && m_Status == Status::RUNNING) {
+            m_PendingLevelUps += levelUps;
+            EnterLevelUp();
+        }
+    }
+
+    ++m_ChestsOpened;
+    chest->Destroy();
 }
 
 void GameScene::HandleCollisions() {
@@ -406,6 +444,7 @@ void GameScene::HandleCollisions() {
                 ++m_KillCount;
                 if (enemy->IsElite()) {
                     ++m_EliteKills;
+                    SpawnRewardChest(enemy->GetPosition());
                 }
                 SpawnExperienceGem(enemy->GetPosition(), enemy->GetExperienceValue());
             }
@@ -449,6 +488,19 @@ void GameScene::HandleCollisions() {
         }
         gem->Destroy();
     }
+
+    for (const auto &chest : m_RewardChests) {
+        if (!chest->IsAlive()) {
+            continue;
+        }
+
+        if (!IsColliding(m_Player->GetPosition(), m_Player->GetRadius(),
+                         chest->GetPosition(), chest->GetRadius())) {
+            continue;
+        }
+
+        OpenRewardChest(chest);
+    }
 }
 
 void GameScene::CleanupDestroyed() {
@@ -468,6 +520,7 @@ void GameScene::CleanupDestroyed() {
     removeDestroyed(m_Projectiles);
     removeDestroyed(m_Enemies);
     removeDestroyed(m_ExperienceGems);
+    removeDestroyed(m_RewardChests);
 }
 
 void GameScene::UpdateHud() const {
@@ -495,8 +548,10 @@ void GameScene::UpdateHud() const {
                << static_cast<int>(VICTORY_TIME_SECONDS) << "s\n";
         stream << "Level: " << m_Player->GetLevel()
                << "  Kills: " << m_KillCount
-               << "  Elites: " << m_EliteKills << '\n';
+               << "  Elites: " << m_EliteKills
+               << "  Chests: " << m_ChestsOpened << '\n';
         stream << "Weapons: " << m_Weapons->GetDisplayNames() << "\n\n";
+        stream << "Last Reward: " << m_LastRewardText << "\n\n";
         stream << "R: Restart  Enter: Title  ESC: Exit";
         m_Hud->SetContent(stream.str());
         return;
@@ -514,6 +569,7 @@ void GameScene::UpdateHud() const {
            << "  Magnet: " << static_cast<int>(m_Player->GetPickupRadius())
            << '\n';
     stream << "Kills: " << m_KillCount << "  Elites: " << m_EliteKills
+           << "  Chests: " << m_ChestsOpened
            << "  Next Elite: "
            << std::max(0, static_cast<int>(m_NextEliteSpawnTime - m_SurvivalTime))
            << "s\n";
@@ -536,13 +592,15 @@ void GameScene::UpdateHud() const {
     } else {
         stream << "\nAuto-fire is active. Collect XP gems to choose upgrades.";
     }
+    stream << "\n" << "Last Reward: " << m_LastRewardText;
 
 #ifdef DEBUG_TOOLS_ENABLED
     if (m_ShowDebugHud) {
         stream << "\n[Debug] T: HUD  Y: Level Up  U: Unlock Nova  "
-               << "I: Weapon Lv  O: Wave  P: Elite  V: Victory";
+               << "I: Weapon Lv  O: Wave  P: Elite  C: Chest  V: Victory";
         stream << "\n[Debug] Projectiles: " << m_Projectiles.size()
                << "  Gems: " << m_ExperienceGems.size()
+               << "  Chests: " << m_RewardChests.size()
                << "  Pending LevelUps: " << m_PendingLevelUps
                << "  Elite Spawns: " << m_EliteSpawnsCompleted;
     } else {

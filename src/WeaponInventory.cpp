@@ -43,6 +43,27 @@ bool WeaponInventory::LevelUpWeapon(WeaponType type) {
     return weapon->LevelUp();
 }
 
+std::string WeaponInventory::LevelUpRandomWeapon(std::mt19937 &rng) {
+    std::vector<Weapon *> candidates;
+    for (const auto &weapon : m_Weapons) {
+        if (weapon->CanLevelUp()) {
+            candidates.push_back(weapon.get());
+        }
+    }
+
+    if (candidates.empty()) {
+        return "";
+    }
+
+    const int selectedIndex = std::uniform_int_distribution<int>(
+        0, static_cast<int>(candidates.size()) - 1)(rng);
+    Weapon *selectedWeapon = candidates[static_cast<std::size_t>(selectedIndex)];
+    selectedWeapon->LevelUp();
+
+    return selectedWeapon->GetDisplayName() + " Lv." +
+           std::to_string(selectedWeapon->GetLevel());
+}
+
 bool WeaponInventory::LevelUpAllWeapons() {
     bool didLevelUp = false;
     for (const auto &weapon : m_Weapons) {

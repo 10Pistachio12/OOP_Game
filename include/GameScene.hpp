@@ -11,6 +11,7 @@
 #include "Hud.hpp"
 #include "Player.hpp"
 #include "Projectile.hpp"
+#include "RewardChest.hpp"
 #include "UpgradeManager.hpp"
 #include "Util/Renderer.hpp"
 #include "WeaponInventory.hpp"
@@ -47,8 +48,10 @@ private:
     void SpawnEliteWave();
     void SpawnEnemy(EnemyType enemyType, float difficultyScale);
     void SpawnExperienceGem(const glm::vec2 &position, int value);
+    void SpawnRewardChest(const glm::vec2 &position);
     void SpawnProjectiles(
         const std::vector<std::shared_ptr<Projectile>> &projectiles);
+    void OpenRewardChest(const std::shared_ptr<RewardChest> &chest);
     void HandleCollisions();
     void CleanupDestroyed();
     void UpdateHud() const;
@@ -65,15 +68,18 @@ private:
     std::vector<std::shared_ptr<Enemy>> m_Enemies;
     std::vector<std::shared_ptr<Projectile>> m_Projectiles;
     std::vector<std::shared_ptr<ExperienceGem>> m_ExperienceGems;
+    std::vector<std::shared_ptr<RewardChest>> m_RewardChests;
     Util::Renderer m_Renderer;
     Status m_Status = Status::TITLE;
     int m_PendingLevelUps = 0;
     int m_KillCount = 0;
     int m_EliteKills = 0;
     int m_EliteSpawnsCompleted = 0;
+    int m_ChestsOpened = 0;
     float m_SurvivalTime = 0.0F;
     float m_EnemySpawnTimer = 0.0F;
     float m_NextEliteSpawnTime = 25.0F;
+    std::string m_LastRewardText = "None";
 #ifdef DEBUG_TOOLS_ENABLED
     bool m_ShowDebugHud = false;
 #endif

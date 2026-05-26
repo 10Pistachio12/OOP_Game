@@ -13,6 +13,7 @@ set(SRC_FILES
     MagicBoltWeapon.cpp
     Player.cpp
     Projectile.cpp
+    RewardChest.cpp
     SlimeEnemy.cpp
     Upgrade.cpp
     UpgradeManager.cpp
@@ -35,6 +36,7 @@ set(INCLUDE_FILES
     MagicBoltWeapon.hpp
     Player.hpp
     Projectile.hpp
+    RewardChest.hpp
     SlimeEnemy.hpp
     Upgrade.hpp
     UpgradeManager.hpp
