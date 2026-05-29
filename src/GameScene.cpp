@@ -117,6 +117,7 @@ void GameScene::Update() {
     }
 
     m_Player->UpdateMovement(deltaTimeSeconds);
+    m_PlayerMarker->Update(m_Player->GetPosition(), deltaTimeSeconds);
 
     for (const auto &enemy : m_Enemies) {
         if (enemy->IsAlive()) {
@@ -196,6 +197,7 @@ void GameScene::Reset() {
     m_FloatingTexts.clear();
 
     m_Player = std::make_shared<Player>(m_FontPath);
+    m_PlayerMarker = std::make_shared<PlayerMarker>(m_FontPath);
     m_Hud = std::make_shared<Hud>(m_FontPath);
     m_Weapons = std::make_unique<WeaponInventory>(m_FontPath);
     m_Weapons->UnlockWeapon(WeaponType::MagicBolt);
@@ -206,6 +208,7 @@ void GameScene::Reset() {
     m_UpgradeChoices.clear();
 
     m_Renderer.AddChild(m_Player);
+    m_Renderer.AddChild(m_PlayerMarker);
     m_Renderer.AddChild(m_Hud);
     UpdateHud();
 }

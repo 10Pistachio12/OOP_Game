@@ -13,6 +13,7 @@ set(SRC_FILES
     Hud.cpp
     MagicBoltWeapon.cpp
     Player.cpp
+    PlayerMarker.cpp
     Projectile.cpp
     RewardChest.cpp
     SlimeEnemy.cpp
@@ -37,6 +38,7 @@ set(INCLUDE_FILES
     Hud.hpp
     MagicBoltWeapon.hpp
     Player.hpp
+    PlayerMarker.hpp
     Projectile.hpp
     RewardChest.hpp
     SlimeEnemy.hpp

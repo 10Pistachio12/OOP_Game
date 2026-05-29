@@ -11,6 +11,7 @@
 #include "FloatingText.hpp"
 #include "Hud.hpp"
 #include "Player.hpp"
+#include "PlayerMarker.hpp"
 #include "Projectile.hpp"
 #include "RewardChest.hpp"
 #include "UpgradeManager.hpp"
@@ -66,6 +67,7 @@ private:
     std::string m_FontPath;
     mutable std::shared_ptr<Hud> m_Hud;
     std::shared_ptr<Player> m_Player;
+    std::shared_ptr<PlayerMarker> m_PlayerMarker;
     std::unique_ptr<WeaponInventory> m_Weapons;
     std::mt19937 m_Rng;
     std::unique_ptr<EnemyDirector> m_EnemyDirector;
