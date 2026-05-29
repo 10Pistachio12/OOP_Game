@@ -5,6 +5,7 @@ set(SRC_FILES
     BruteEnemy.cpp
     Enemy.cpp
     EnemyDirector.cpp
+    EnemyHealthBar.cpp
     EliteEnemy.cpp
     ExperienceGem.cpp
     FloatingText.cpp
@@ -30,6 +31,7 @@ set(INCLUDE_FILES
     Character.hpp
     Enemy.hpp
     EnemyDirector.hpp
+    EnemyHealthBar.hpp
     EliteEnemy.hpp
     ExperienceGem.hpp
     FloatingText.hpp

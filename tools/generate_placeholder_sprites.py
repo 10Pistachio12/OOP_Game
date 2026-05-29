@@ -27,6 +27,7 @@ PALETTE = {
     "P": (122, 90, 196, 255),
     "R": (199, 67, 52, 255),
     "W": (255, 250, 220, 255),
+    "X": (48, 52, 62, 255),
     "Y": (247, 217, 94, 255),
     "g": (39, 126, 72, 255),
 }
@@ -213,6 +214,26 @@ SPRITES = {
         "................",
     ],
 }
+
+HEALTH_BAR_STEPS = 10
+
+
+def make_health_bar_pattern(step: int) -> list[str]:
+    interior_width = 18
+    fill_width = round(interior_width * step / HEALTH_BAR_STEPS)
+    fill_color = "G" if step >= 6 else "Y" if step >= 3 else "R"
+    fill = fill_color * fill_width + "X" * (interior_width - fill_width)
+
+    return [
+        "W" * 20,
+        f"W{fill}W",
+        f"W{fill}W",
+        "W" * 20,
+    ]
+
+
+for health_step in range(HEALTH_BAR_STEPS + 1):
+    SPRITES[f"health_bar_{health_step}"] = make_health_bar_pattern(health_step)
 
 
 def make_chunk(kind: bytes, payload: bytes) -> bytes:

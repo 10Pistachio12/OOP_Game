@@ -125,6 +125,10 @@ void GameScene::Update() {
         }
     }
 
+    for (const auto &display : m_EnemyHealthDisplays) {
+        display.healthBar->Update(*display.enemy);
+    }
+
     for (const auto &projectile : m_Projectiles) {
         if (projectile->IsAlive()) {
             projectile->Update(deltaTimeSeconds);
@@ -167,6 +171,7 @@ void GameScene::ShowTitleScreen() {
 
     m_Renderer = Util::Renderer();
     m_Enemies.clear();
+    m_EnemyHealthDisplays.clear();
     m_Projectiles.clear();
     m_ExperienceGems.clear();
     m_RewardChests.clear();
@@ -191,6 +196,7 @@ void GameScene::Reset() {
 
     m_Renderer = Util::Renderer();
     m_Enemies.clear();
+    m_EnemyHealthDisplays.clear();
     m_Projectiles.clear();
     m_ExperienceGems.clear();
     m_RewardChests.clear();
@@ -408,6 +414,10 @@ void GameScene::SpawnEnemy(EnemyType enemyType, float difficultyScale) {
 
     m_Enemies.push_back(enemy);
     m_Renderer.AddChild(enemy);
+
+    auto healthBar = std::make_shared<EnemyHealthBar>();
+    m_EnemyHealthDisplays.push_back({enemy, healthBar});
+    m_Renderer.AddChild(healthBar);
 }
 
 void GameScene::SpawnExperienceGem(const glm::vec2 &position, int value) {
@@ -566,6 +576,19 @@ void GameScene::HandleCollisions() {
 }
 
 void GameScene::CleanupDestroyed() {
+    m_EnemyHealthDisplays.erase(
+        std::remove_if(m_EnemyHealthDisplays.begin(), m_EnemyHealthDisplays.end(),
+                       [this](const auto &display) {
+                           if (display.enemy->IsAlive() &&
+                               display.healthBar->IsAlive()) {
+                               return false;
+                           }
+                           display.healthBar->Destroy();
+                           m_Renderer.RemoveChild(display.healthBar);
+                           return true;
+                       }),
+        m_EnemyHealthDisplays.end());
+
     auto removeDestroyed = [this](auto &objects) {
         objects.erase(
             std::remove_if(objects.begin(), objects.end(),
@@ -666,6 +689,7 @@ void GameScene::UpdateHud() const {
                << "  Gems: " << m_ExperienceGems.size()
                << "  Chests: " << m_RewardChests.size()
                << "  Texts: " << m_FloatingTexts.size()
+               << "  Bars: " << m_EnemyHealthDisplays.size()
                << "  Pending LevelUps: " << m_PendingLevelUps
                << "  Elite Spawns: " << m_EliteSpawnsCompleted;
     } else {

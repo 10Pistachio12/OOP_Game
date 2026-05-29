@@ -7,6 +7,7 @@
 
 #include "Enemy.hpp"
 #include "EnemyDirector.hpp"
+#include "EnemyHealthBar.hpp"
 #include "ExperienceGem.hpp"
 #include "FloatingText.hpp"
 #include "Hud.hpp"
@@ -26,6 +27,11 @@ public:
     void Update();
 
 private:
+    struct EnemyHealthDisplay {
+        std::shared_ptr<Enemy> enemy;
+        std::shared_ptr<EnemyHealthBar> healthBar;
+    };
+
     enum class Status {
         TITLE,
         RUNNING,
@@ -74,6 +80,7 @@ private:
     std::unique_ptr<UpgradeManager> m_UpgradeManager;
     std::vector<std::shared_ptr<Upgrade>> m_UpgradeChoices;
     std::vector<std::shared_ptr<Enemy>> m_Enemies;
+    std::vector<EnemyHealthDisplay> m_EnemyHealthDisplays;
     std::vector<std::shared_ptr<Projectile>> m_Projectiles;
     std::vector<std::shared_ptr<ExperienceGem>> m_ExperienceGems;
     std::vector<std::shared_ptr<RewardChest>> m_RewardChests;
