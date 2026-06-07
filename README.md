@@ -15,7 +15,7 @@ upgrades on level up.
 - Orbiting Shield adds close-range rotating guard orbs around the player.
 - Early power growth includes projectile-count upgrades for stronger clearing.
 - Placeholder sprites are used for the player, enemies, projectiles, gems, and chests.
-- A pulsing player marker keeps the character readable during dense combat.
+- A subtle player outline keeps the character readable during dense combat.
 - Enemy health bars appear for elites, bulky enemies, and damaged survivors.
 - Slime, Bat, Brute, and Elite enemy classes derived from a shared Enemy base.
 - EnemyDirector controls timed phases, spawn rate, batch size, enemy mix, and timed elite spawns.

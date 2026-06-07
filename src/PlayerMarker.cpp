@@ -5,10 +5,9 @@
 #include "SpriteAssets.hpp"
 
 namespace {
-constexpr float BASE_SCALE = 1.62F;
-constexpr float PULSE_SCALE = 0.08F;
-constexpr float PULSE_SPEED = 8.0F;
-constexpr float ROTATION_SPEED = 1.2F;
+constexpr float BASE_SCALE = 1.22F;
+constexpr float PULSE_SCALE = 0.035F;
+constexpr float PULSE_SPEED = 7.0F;
 } // namespace
 
 PlayerMarker::PlayerMarker(const std::string &fontPath)
@@ -24,5 +23,4 @@ void PlayerMarker::Update(const glm::vec2 &playerPosition,
 
     SetPosition(playerPosition);
     m_Transform.scale = {BASE_SCALE + pulse, BASE_SCALE + pulse};
-    m_Transform.rotation += ROTATION_SPEED * deltaTimeSeconds;
 }
