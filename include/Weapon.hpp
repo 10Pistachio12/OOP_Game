@@ -10,6 +10,7 @@ class Projectile;
 enum class WeaponType {
     MagicBolt,
     ArcaneNova,
+    OrbitingShield,
 };
 
 inline std::string GetWeaponTypeDisplayName(WeaponType type) {
@@ -18,6 +19,8 @@ inline std::string GetWeaponTypeDisplayName(WeaponType type) {
             return "Magic Bolt";
         case WeaponType::ArcaneNova:
             return "Arcane Nova";
+        case WeaponType::OrbitingShield:
+            return "Orbiting Shield";
         default:
             return "Unknown Weapon";
     }

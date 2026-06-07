@@ -35,6 +35,13 @@ std::vector<std::shared_ptr<Upgrade>> UpgradeManager::GenerateChoices(
             WeaponType::ArcaneNova));
     }
 
+    if (!weapons.HasWeapon(WeaponType::OrbitingShield)) {
+        pool.push_back(std::make_shared<UnlockWeaponUpgrade>(
+            WeaponType::OrbitingShield));
+        pool.push_back(std::make_shared<UnlockWeaponUpgrade>(
+            WeaponType::OrbitingShield));
+    }
+
     std::shuffle(pool.begin(), pool.end(), m_Rng);
     if (count < pool.size()) {
         pool.resize(count);

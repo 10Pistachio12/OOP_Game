@@ -12,6 +12,7 @@ upgrades on level up.
 - The player starts with Magic Bolt and can unlock Arcane Nova through level-up choices.
 - Each weapon has levels and weapon-specific upgrade effects.
 - Auto-targeting Magic Bolt weapon and radial Arcane Nova burst weapon.
+- Orbiting Shield adds close-range rotating guard orbs around the player.
 - Early power growth includes projectile-count upgrades for stronger clearing.
 - Placeholder sprites are used for the player, enemies, projectiles, gems, and chests.
 - A pulsing player marker keeps the character readable during dense combat.
@@ -40,6 +41,7 @@ Debug builds enable test shortcuts for faster gameplay verification:
 - T: Toggle debug HUD
 - Y: Grant enough XP to trigger one level-up choice
 - U: Unlock Arcane Nova
+- J: Unlock Orbiting Shield
 - I: Level up all owned weapons
 - O: Spawn an enemy wave
 - P: Spawn an elite enemy wave

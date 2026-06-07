@@ -5,6 +5,7 @@
 
 #include "ArcaneNovaWeapon.hpp"
 #include "MagicBoltWeapon.hpp"
+#include "OrbitingShieldWeapon.hpp"
 
 WeaponInventory::WeaponInventory(std::string fontPath)
     : m_FontPath(std::move(fontPath)) {}
@@ -177,6 +178,8 @@ std::unique_ptr<Weapon> WeaponInventory::CreateWeapon(WeaponType type) const {
             return std::make_unique<MagicBoltWeapon>(m_FontPath);
         case WeaponType::ArcaneNova:
             return std::make_unique<ArcaneNovaWeapon>(m_FontPath);
+        case WeaponType::OrbitingShield:
+            return std::make_unique<OrbitingShieldWeapon>(m_FontPath);
         default:
             return nullptr;
     }

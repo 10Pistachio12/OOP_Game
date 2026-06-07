@@ -39,6 +39,8 @@ std::string UnlockWeaponUpgrade::GetDescription() const {
     switch (m_WeaponType) {
         case WeaponType::ArcaneNova:
             return "Adds a radial burst weapon";
+        case WeaponType::OrbitingShield:
+            return "Adds orbiting guard orbs around the player";
         case WeaponType::MagicBolt:
             return "Adds an auto-targeting bolt weapon";
         default:

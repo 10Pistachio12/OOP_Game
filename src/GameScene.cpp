@@ -286,6 +286,10 @@ void GameScene::HandleDebugInput() {
         m_Weapons->UnlockWeapon(WeaponType::ArcaneNova);
     }
 
+    if (Util::Input::IsKeyDown(Util::Keycode::J)) {
+        m_Weapons->UnlockWeapon(WeaponType::OrbitingShield);
+    }
+
     if (Util::Input::IsKeyDown(Util::Keycode::I)) {
         m_Weapons->LevelUpAllWeapons();
     }
@@ -684,7 +688,8 @@ void GameScene::UpdateHud() const {
 #ifdef DEBUG_TOOLS_ENABLED
     if (m_ShowDebugHud) {
         stream << "\n[Debug] T: HUD  Y: Level Up  U: Unlock Nova  "
-               << "I: Weapon Lv  O: Wave  P: Elite  C: Chest  V: Victory";
+               << "J: Unlock Shield  I: Weapon Lv  O: Wave  P: Elite  "
+               << "C: Chest  V: Victory";
         stream << "\n[Debug] Projectiles: " << m_Projectiles.size()
                << "  Gems: " << m_ExperienceGems.size()
                << "  Chests: " << m_RewardChests.size()

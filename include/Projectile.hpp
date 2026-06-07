@@ -12,7 +12,7 @@ public:
                Util::Color color = Util::Color(247, 222, 104),
                float radius = 10.0F);
 
-    void Update(float deltaTimeSeconds);
+    virtual void Update(float deltaTimeSeconds);
 
     int GetDamage() const { return m_Damage; }
 

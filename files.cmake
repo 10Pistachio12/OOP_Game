@@ -13,6 +13,8 @@ set(SRC_FILES
     GlyphObject.cpp
     Hud.cpp
     MagicBoltWeapon.cpp
+    OrbitingProjectile.cpp
+    OrbitingShieldWeapon.cpp
     Player.cpp
     PlayerMarker.cpp
     Projectile.cpp
@@ -39,6 +41,8 @@ set(INCLUDE_FILES
     GlyphObject.hpp
     Hud.hpp
     MagicBoltWeapon.hpp
+    OrbitingProjectile.hpp
+    OrbitingShieldWeapon.hpp
     Player.hpp
     PlayerMarker.hpp
     Projectile.hpp
