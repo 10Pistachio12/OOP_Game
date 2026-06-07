@@ -13,9 +13,12 @@ public:
                        float lifetimeSeconds);
 
     void Update(float deltaTimeSeconds) override;
+    void OnHitEnemy(Enemy &enemy) override;
+    bool CanDamageEnemy(const Enemy &enemy) const override;
 
 private:
     const Player *m_Owner = nullptr;
+    std::unordered_map<const Enemy *, float> m_EnemyHitCooldowns;
     float m_Angle = 0.0F;
     float m_OrbitRadius = 0.0F;
     float m_AngularSpeed = 0.0F;

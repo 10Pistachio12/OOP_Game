@@ -502,8 +502,12 @@ void GameScene::HandleCollisions() {
                 continue;
             }
 
+            if (!projectile->CanDamageEnemy(*enemy)) {
+                continue;
+            }
+
             enemy->TakeDamage(projectile->GetDamage());
-            projectile->Destroy();
+            projectile->OnHitEnemy(*enemy);
             SpawnFloatingText("-" + std::to_string(projectile->GetDamage()),
                               enemy->GetPosition() + glm::vec2(0.0F, 18.0F),
                               Util::Color(255, 120, 95), 0.55F);
@@ -518,7 +522,9 @@ void GameScene::HandleCollisions() {
                 }
                 SpawnExperienceGem(enemy->GetPosition(), enemy->GetExperienceValue());
             }
-            break;
+            if (!projectile->IsAlive()) {
+                break;
+            }
         }
     }
 

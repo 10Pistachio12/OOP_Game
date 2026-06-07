@@ -2,7 +2,12 @@
 
 #include <cmath>
 
+#include "Enemy.hpp"
 #include "Player.hpp"
+
+namespace {
+constexpr float CONTACT_DAMAGE_COOLDOWN_SECONDS = 0.45F;
+}
 
 OrbitingProjectile::OrbitingProjectile(const std::string &fontPath,
                                        const Player &owner,
@@ -26,9 +31,27 @@ void OrbitingProjectile::Update(float deltaTimeSeconds) {
         return;
     }
 
+    for (auto it = m_EnemyHitCooldowns.begin();
+         it != m_EnemyHitCooldowns.end();) {
+        it->second -= deltaTimeSeconds;
+        if (it->second <= 0.0F) {
+            it = m_EnemyHitCooldowns.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
     m_Angle += m_AngularSpeed * deltaTimeSeconds;
     SetPosition(m_Owner->GetPosition() +
                 glm::vec2(std::cos(m_Angle), std::sin(m_Angle)) *
                     m_OrbitRadius);
     m_Transform.rotation += m_AngularSpeed * deltaTimeSeconds;
+}
+
+void OrbitingProjectile::OnHitEnemy(Enemy &enemy) {
+    m_EnemyHitCooldowns[&enemy] = CONTACT_DAMAGE_COOLDOWN_SECONDS;
+}
+
+bool OrbitingProjectile::CanDamageEnemy(const Enemy &enemy) const {
+    return m_EnemyHitCooldowns.find(&enemy) == m_EnemyHitCooldowns.end();
 }

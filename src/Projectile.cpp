@@ -2,6 +2,7 @@
 
 #include <glm/geometric.hpp>
 
+#include "Enemy.hpp"
 #include "SpriteAssets.hpp"
 
 namespace {
@@ -46,4 +47,12 @@ void Projectile::Update(float deltaTimeSeconds) {
     if (m_RemainingLifetime <= 0.0F) {
         Destroy();
     }
+}
+
+void Projectile::OnHitEnemy(Enemy &) {
+    Destroy();
+}
+
+bool Projectile::CanDamageEnemy(const Enemy &) const {
+    return true;
 }

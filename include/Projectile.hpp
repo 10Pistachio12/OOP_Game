@@ -3,6 +3,8 @@
 
 #include "GlyphObject.hpp"
 
+class Enemy;
+
 class Projectile : public GlyphObject {
 public:
     Projectile(const std::string &fontPath, const glm::vec2 &spawnPosition,
@@ -13,6 +15,8 @@ public:
                float radius = 10.0F);
 
     virtual void Update(float deltaTimeSeconds);
+    virtual void OnHitEnemy(Enemy &enemy);
+    virtual bool CanDamageEnemy(const Enemy &enemy) const;
 
     int GetDamage() const { return m_Damage; }
 
