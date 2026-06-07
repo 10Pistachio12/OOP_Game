@@ -8,12 +8,21 @@
 class Player;
 class WeaponInventory;
 
+enum class UpgradeRarity {
+    Common,
+    Uncommon,
+    Rare,
+};
+
+std::string GetUpgradeRarityLabel(UpgradeRarity rarity);
+
 class Upgrade {
 public:
     virtual ~Upgrade() = default;
 
     virtual std::string GetName() const = 0;
     virtual std::string GetDescription() const = 0;
+    virtual UpgradeRarity GetRarity() const { return UpgradeRarity::Common; }
     virtual void Apply(Player &player, WeaponInventory &weapons) const = 0;
 };
 
@@ -42,6 +51,7 @@ class WeaponDamageUpgrade final : public Upgrade {
 public:
     std::string GetName() const override { return "Sharper Arsenal"; }
     std::string GetDescription() const override { return "+1 damage to all weapons"; }
+    UpgradeRarity GetRarity() const override { return UpgradeRarity::Uncommon; }
     void Apply(Player &player, WeaponInventory &weapons) const override;
 };
 
@@ -49,6 +59,7 @@ class WeaponCooldownUpgrade final : public Upgrade {
 public:
     std::string GetName() const override { return "Quick Cast"; }
     std::string GetDescription() const override { return "-14% cooldown on all weapons"; }
+    UpgradeRarity GetRarity() const override { return UpgradeRarity::Uncommon; }
     void Apply(Player &player, WeaponInventory &weapons) const override;
 };
 
@@ -56,6 +67,7 @@ class ProjectileCountUpgrade final : public Upgrade {
 public:
     std::string GetName() const override { return "Twin Casting"; }
     std::string GetDescription() const override { return "+1 projectile pattern to all weapons"; }
+    UpgradeRarity GetRarity() const override { return UpgradeRarity::Rare; }
     void Apply(Player &player, WeaponInventory &weapons) const override;
 };
 
@@ -65,6 +77,7 @@ public:
 
     std::string GetName() const override;
     std::string GetDescription() const override;
+    UpgradeRarity GetRarity() const override { return UpgradeRarity::Rare; }
     void Apply(Player &player, WeaponInventory &weapons) const override;
 
 private:
@@ -78,6 +91,7 @@ public:
 
     std::string GetName() const override;
     std::string GetDescription() const override;
+    UpgradeRarity GetRarity() const override;
     void Apply(Player &player, WeaponInventory &weapons) const override;
 
 private:

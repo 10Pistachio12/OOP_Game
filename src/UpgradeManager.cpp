@@ -4,48 +4,92 @@
 
 #include "WeaponInventory.hpp"
 
+namespace {
+struct UpgradeCandidate {
+    std::shared_ptr<Upgrade> upgrade;
+    int weight = 1;
+};
+
+void AddCandidate(std::vector<UpgradeCandidate> &candidates,
+                  std::shared_ptr<Upgrade> upgrade, int weight) {
+    if (weight <= 0) {
+        return;
+    }
+
+    candidates.push_back({std::move(upgrade), weight});
+}
+
+int GetWeaponLevelWeight(const WeaponInventory &weapons, WeaponType type) {
+    const int currentLevel = weapons.GetWeaponLevel(type);
+    return std::max(10, 20 - currentLevel * 2);
+}
+
+std::size_t PickWeightedIndex(const std::vector<UpgradeCandidate> &candidates,
+                              std::mt19937 &rng) {
+    int totalWeight = 0;
+    for (const auto &candidate : candidates) {
+        totalWeight += candidate.weight;
+    }
+
+    std::uniform_int_distribution<int> distribution(1, totalWeight);
+    int roll = distribution(rng);
+    for (std::size_t i = 0; i < candidates.size(); ++i) {
+        roll -= candidates[i].weight;
+        if (roll <= 0) {
+            return i;
+        }
+    }
+
+    return candidates.size() - 1;
+}
+}
+
 UpgradeManager::UpgradeManager(std::mt19937 &rng)
     : m_Rng(rng) {}
 
 std::vector<std::shared_ptr<Upgrade>> UpgradeManager::GenerateChoices(
     std::size_t count, const WeaponInventory &weapons) {
-    std::vector<std::shared_ptr<Upgrade>> pool{
-        std::make_shared<MoveSpeedUpgrade>(),
-        std::make_shared<MaxHealthUpgrade>(),
-        std::make_shared<PickupRangeUpgrade>(),
-        std::make_shared<WeaponDamageUpgrade>(),
-        std::make_shared<WeaponCooldownUpgrade>(),
-        std::make_shared<ProjectileCountUpgrade>(),
-    };
+    std::vector<UpgradeCandidate> candidates;
+    AddCandidate(candidates, std::make_shared<MoveSpeedUpgrade>(), 12);
+    AddCandidate(candidates, std::make_shared<MaxHealthUpgrade>(), 14);
+    AddCandidate(candidates, std::make_shared<PickupRangeUpgrade>(), 10);
+    AddCandidate(candidates, std::make_shared<WeaponDamageUpgrade>(), 15);
+    AddCandidate(candidates, std::make_shared<WeaponCooldownUpgrade>(), 14);
+    AddCandidate(candidates, std::make_shared<ProjectileCountUpgrade>(), 7);
 
     for (WeaponType type : weapons.GetOwnedWeaponTypes()) {
         if (!weapons.CanLevelUpWeapon(type)) {
             continue;
         }
 
-        pool.push_back(std::make_shared<WeaponLevelUpgrade>(
-            type, weapons.GetWeaponLevel(type) + 1,
-            weapons.GetWeaponLevelUpDescription(type)));
+        AddCandidate(candidates,
+                     std::make_shared<WeaponLevelUpgrade>(
+                         type, weapons.GetWeaponLevel(type) + 1,
+                         weapons.GetWeaponLevelUpDescription(type)),
+                     GetWeaponLevelWeight(weapons, type));
     }
 
     if (!weapons.HasWeapon(WeaponType::ArcaneNova)) {
-        pool.push_back(std::make_shared<UnlockWeaponUpgrade>(
-            WeaponType::ArcaneNova));
-        pool.push_back(std::make_shared<UnlockWeaponUpgrade>(
-            WeaponType::ArcaneNova));
+        AddCandidate(candidates,
+                     std::make_shared<UnlockWeaponUpgrade>(
+                         WeaponType::ArcaneNova),
+                     11);
     }
 
     if (!weapons.HasWeapon(WeaponType::OrbitingShield)) {
-        pool.push_back(std::make_shared<UnlockWeaponUpgrade>(
-            WeaponType::OrbitingShield));
-        pool.push_back(std::make_shared<UnlockWeaponUpgrade>(
-            WeaponType::OrbitingShield));
+        AddCandidate(candidates,
+                     std::make_shared<UnlockWeaponUpgrade>(
+                         WeaponType::OrbitingShield),
+                     11);
     }
 
-    std::shuffle(pool.begin(), pool.end(), m_Rng);
-    if (count < pool.size()) {
-        pool.resize(count);
+    std::vector<std::shared_ptr<Upgrade>> choices;
+    while (choices.size() < count && !candidates.empty()) {
+        const std::size_t selectedIndex = PickWeightedIndex(candidates, m_Rng);
+        choices.push_back(candidates[selectedIndex].upgrade);
+        candidates.erase(candidates.begin() +
+                         static_cast<std::ptrdiff_t>(selectedIndex));
     }
 
-    return pool;
+    return choices;
 }

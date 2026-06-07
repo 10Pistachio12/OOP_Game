@@ -22,7 +22,7 @@ upgrades on level up.
 - Elite enemies drop reward chests that upgrade a random owned weapon.
 - XP gems are magnetized toward the player within pickup range.
 - Taking contact damage grants a brief invulnerability flash.
-- Level-up choices include character stats, all-weapon bonuses, weapon unlocks, and weapon level-ups.
+- Level-up choices use weighted rarity tiers for character stats, all-weapon bonuses, weapon unlocks, and weapon level-ups.
 - HUD shows HP, level, XP, survival time, wave phase, kills, elite countdown, and weapon levels.
 - Title, pause, victory, game-over, and run-result screens.
 

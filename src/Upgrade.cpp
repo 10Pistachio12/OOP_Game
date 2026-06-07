@@ -3,6 +3,19 @@
 #include "Player.hpp"
 #include "WeaponInventory.hpp"
 
+std::string GetUpgradeRarityLabel(UpgradeRarity rarity) {
+    switch (rarity) {
+        case UpgradeRarity::Common:
+            return "Common";
+        case UpgradeRarity::Uncommon:
+            return "Uncommon";
+        case UpgradeRarity::Rare:
+            return "Rare";
+        default:
+            return "Unknown";
+    }
+}
+
 void MoveSpeedUpgrade::Apply(Player &player, WeaponInventory &) const {
     player.IncreaseMoveSpeed(35.0F);
 }
@@ -65,6 +78,18 @@ std::string WeaponLevelUpgrade::GetName() const {
 
 std::string WeaponLevelUpgrade::GetDescription() const {
     return m_Description;
+}
+
+UpgradeRarity WeaponLevelUpgrade::GetRarity() const {
+    if (m_NextLevel >= 5) {
+        return UpgradeRarity::Rare;
+    }
+
+    if (m_NextLevel >= 3) {
+        return UpgradeRarity::Uncommon;
+    }
+
+    return UpgradeRarity::Common;
 }
 
 void WeaponLevelUpgrade::Apply(Player &, WeaponInventory &weapons) const {

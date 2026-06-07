@@ -687,7 +687,9 @@ void GameScene::UpdateHud() const {
         }
         stream << ":";
         for (std::size_t i = 0; i < m_UpgradeChoices.size(); ++i) {
-            stream << "\n" << (i + 1) << ". " << m_UpgradeChoices[i]->GetName()
+            stream << "\n" << (i + 1) << ". "
+                   << "[" << GetUpgradeRarityLabel(m_UpgradeChoices[i]->GetRarity())
+                   << "] " << m_UpgradeChoices[i]->GetName()
                    << " - " << m_UpgradeChoices[i]->GetDescription();
         }
     } else {
