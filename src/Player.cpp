@@ -10,12 +10,18 @@
 
 namespace {
 constexpr float PLAYER_MARGIN = 36.0F;
+constexpr float DAMAGE_INVULNERABILITY_SECONDS = 0.75F;
 }
 
 Player::Player(const std::string &fontPath)
     : Character(SpriteAssets::Path("player.png"), {1.1F, 1.1F}, 10.0F, 18.0F,
                 260.0F, 8) {
     (void)fontPath;
+}
+
+void Player::Update(float deltaTimeSeconds) {
+    UpdateMovement(deltaTimeSeconds);
+    UpdateInvulnerability(deltaTimeSeconds);
 }
 
 void Player::UpdateMovement(float deltaTimeSeconds) {
@@ -50,6 +56,17 @@ void Player::UpdateMovement(float deltaTimeSeconds) {
     m_Transform.translation.y = std::clamp(m_Transform.translation.y, -maxY, maxY);
 }
 
+void Player::TakeDamage(int amount) {
+    if (!CanTakeDamage()) {
+        return;
+    }
+
+    Character::TakeDamage(amount);
+    if (IsAlive()) {
+        m_InvulnerabilityTimer = DAMAGE_INVULNERABILITY_SECONDS;
+    }
+}
+
 int Player::GainExperience(int amount) {
     m_Experience += amount;
 
@@ -66,4 +83,20 @@ int Player::GainExperience(int amount) {
 void Player::LevelUp() {
     ++m_Level;
     m_ExperienceToNextLevel += 3;
+}
+
+void Player::UpdateInvulnerability(float deltaTimeSeconds) {
+    if (m_InvulnerabilityTimer <= 0.0F) {
+        SetVisible(true);
+        return;
+    }
+
+    m_InvulnerabilityTimer -= deltaTimeSeconds;
+    if (m_InvulnerabilityTimer <= 0.0F) {
+        SetVisible(true);
+        return;
+    }
+
+    const int flashFrame = static_cast<int>(m_InvulnerabilityTimer * 50.0F);
+    SetVisible(flashFrame % 2 == 0);
 }

@@ -116,7 +116,7 @@ void GameScene::Update() {
         m_EnemySpawnTimer = m_EnemyDirector->GetSpawnInterval(m_SurvivalTime);
     }
 
-    m_Player->UpdateMovement(deltaTimeSeconds);
+    m_Player->Update(deltaTimeSeconds);
     m_PlayerMarker->Update(m_Player->GetPosition(), deltaTimeSeconds);
 
     for (const auto &enemy : m_Enemies) {
@@ -535,6 +535,10 @@ void GameScene::HandleCollisions() {
 
         if (!IsColliding(m_Player->GetPosition(), m_Player->GetRadius(),
                          enemy->GetPosition(), enemy->GetRadius())) {
+            continue;
+        }
+
+        if (!m_Player->CanTakeDamage()) {
             continue;
         }
 
