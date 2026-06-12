@@ -9,6 +9,10 @@
 #include "RunicLanceWeapon.hpp"
 #include "UpgradeManager.hpp"
 
+namespace {
+constexpr int MAGIC_BOLT_EVOLUTION_DAMAGE_LEVEL = 3;
+}
+
 WeaponInventory::WeaponInventory(std::string fontPath)
     : m_FontPath(std::move(fontPath)) {}
 
@@ -197,6 +201,36 @@ std::string WeaponInventory::GetDisplayNames() const {
     return stream.str();
 }
 
+std::string WeaponInventory::GetEvolutionStatus(
+    const UpgradeManager &upgrades) const {
+    if (HasWeapon(WeaponType::RunicLance)) {
+        return "Runic Lance evolved";
+    }
+
+    const Weapon *magicBolt = FindWeapon(WeaponType::MagicBolt);
+    if (magicBolt == nullptr) {
+        return "Magic Bolt not owned";
+    }
+
+    std::ostringstream stream;
+    stream << "Magic Bolt -> Runic Lance: ";
+    if (CanEvolveMagicBolt(upgrades)) {
+        stream << "READY - open an elite chest";
+        return stream.str();
+    }
+
+    const int weaponLevel = magicBolt->GetLevel();
+    const int weaponMaxLevel = magicBolt->GetMaxLevel();
+    const int damageLevel =
+        upgrades.GetPassiveUpgradeLevel(PassiveUpgradeType::WeaponDamage);
+    stream << "Magic Bolt Lv." << weaponLevel << "/" << weaponMaxLevel
+           << ", Sharper Arsenal Lv."
+           << std::min(damageLevel, MAGIC_BOLT_EVOLUTION_DAMAGE_LEVEL) << "/"
+           << MAGIC_BOLT_EVOLUTION_DAMAGE_LEVEL;
+
+    return stream.str();
+}
+
 void WeaponInventory::ApplyWeaponPassiveHistory(
     Weapon &weapon, const UpgradeManager &upgrades) const {
     weapon.IncreaseDamage(
@@ -216,7 +250,9 @@ bool WeaponInventory::CanEvolveMagicBolt(
     const UpgradeManager &upgrades) const {
     const Weapon *weapon = FindWeapon(WeaponType::MagicBolt);
     return weapon != nullptr && !weapon->CanLevelUp() &&
-           upgrades.HasPassiveUpgradeLevel(PassiveUpgradeType::WeaponDamage, 3);
+           upgrades.HasPassiveUpgradeLevel(
+               PassiveUpgradeType::WeaponDamage,
+               MAGIC_BOLT_EVOLUTION_DAMAGE_LEVEL);
 }
 
 bool WeaponInventory::ReplaceWeapon(WeaponType originalType,

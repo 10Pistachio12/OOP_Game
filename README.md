@@ -25,6 +25,7 @@ upgrades on level up.
 - Taking contact damage grants a brief invulnerability flash.
 - Level-up choices use weighted rarity tiers for character stats, all-weapon bonuses, weapon unlocks, and weapon level-ups.
 - Passive upgrades show Lv.X/Y and stop appearing after reaching their cap.
+- HUD shows weapon evolution requirements and when an elite chest can trigger evolution.
 - HUD shows HP, level, XP, survival time, wave phase, kills, elite countdown, and weapon levels.
 - Title, pause, victory, game-over, and run-result screens.
 

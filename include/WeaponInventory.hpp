@@ -40,6 +40,7 @@ public:
     void IncreaseProjectileCount(int amount);
 
     std::string GetDisplayNames() const;
+    std::string GetEvolutionStatus(const UpgradeManager &upgrades) const;
     std::size_t GetWeaponCount() const { return m_Weapons.size(); }
 
 private:
