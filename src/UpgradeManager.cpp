@@ -157,3 +157,8 @@ int UpgradeManager::GetPassiveUpgradeLevel(PassiveUpgradeType type) const {
 
     return m_PassiveUpgradeLevels[ToIndex(type)];
 }
+
+bool UpgradeManager::HasPassiveUpgradeLevel(PassiveUpgradeType type,
+                                            int requiredLevel) const {
+    return GetPassiveUpgradeLevel(type) >= requiredLevel;
+}

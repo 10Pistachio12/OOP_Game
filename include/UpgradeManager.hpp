@@ -17,9 +17,9 @@ public:
     std::vector<std::shared_ptr<Upgrade>> GenerateChoices(
         std::size_t count, const WeaponInventory &weapons);
     void RecordApplied(const Upgrade &upgrade);
-
-private:
     int GetPassiveUpgradeLevel(PassiveUpgradeType type) const;
+    bool HasPassiveUpgradeLevel(PassiveUpgradeType type,
+                                int requiredLevel) const;
 
 private:
     std::array<int, static_cast<std::size_t>(PassiveUpgradeType::Count)>

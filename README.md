@@ -12,6 +12,7 @@ upgrades on level up.
 - The player starts with Magic Bolt and can unlock Arcane Nova through level-up choices.
 - Each weapon has levels and weapon-specific upgrade effects.
 - Auto-targeting Magic Bolt weapon and radial Arcane Nova burst weapon.
+- Magic Bolt can evolve into Runic Lance after reaching max level with Sharper Arsenal Lv.3.
 - Orbiting Shield adds close-range rotating guard orbs around the player.
 - Early power growth includes projectile-count upgrades for stronger clearing.
 - Placeholder sprites are used for the player, enemies, projectiles, gems, and chests.
@@ -19,7 +20,7 @@ upgrades on level up.
 - Enemy health bars appear for elites, bulky enemies, and damaged survivors.
 - Slime, Bat, Brute, and Elite enemy classes derived from a shared Enemy base.
 - EnemyDirector controls timed phases, spawn rate, batch size, enemy mix, and timed elite spawns.
-- Elite enemies drop reward chests that upgrade a random owned weapon.
+- Elite enemies drop reward chests that evolve eligible weapons or upgrade a random owned weapon.
 - XP gems are magnetized toward the player within pickup range.
 - Taking contact damage grants a brief invulnerability flash.
 - Level-up choices use weighted rarity tiers for character stats, all-weapon bonuses, weapon unlocks, and weapon level-ups.

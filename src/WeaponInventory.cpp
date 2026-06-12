@@ -6,6 +6,8 @@
 #include "ArcaneNovaWeapon.hpp"
 #include "MagicBoltWeapon.hpp"
 #include "OrbitingShieldWeapon.hpp"
+#include "RunicLanceWeapon.hpp"
+#include "UpgradeManager.hpp"
 
 WeaponInventory::WeaponInventory(std::string fontPath)
     : m_FontPath(std::move(fontPath)) {}
@@ -63,6 +65,39 @@ std::string WeaponInventory::LevelUpRandomWeapon(std::mt19937 &rng) {
 
     return selectedWeapon->GetDisplayName() + " Lv." +
            std::to_string(selectedWeapon->GetLevel());
+}
+
+std::string WeaponInventory::EvolveRandomWeapon(
+    std::mt19937 &rng, const UpgradeManager &upgrades) {
+    std::vector<WeaponType> candidates;
+    if (CanEvolveMagicBolt(upgrades)) {
+        candidates.push_back(WeaponType::MagicBolt);
+    }
+
+    if (candidates.empty()) {
+        return "";
+    }
+
+    const int selectedIndex = std::uniform_int_distribution<int>(
+        0, static_cast<int>(candidates.size()) - 1)(rng);
+    const WeaponType selectedType =
+        candidates[static_cast<std::size_t>(selectedIndex)];
+
+    switch (selectedType) {
+        case WeaponType::MagicBolt: {
+            auto evolvedWeapon = std::make_unique<RunicLanceWeapon>(m_FontPath);
+            ApplyWeaponPassiveHistory(*evolvedWeapon, upgrades);
+            if (ReplaceWeapon(WeaponType::MagicBolt,
+                              std::move(evolvedWeapon))) {
+                return "Magic Bolt evolved into Runic Lance";
+            }
+            break;
+        }
+        default:
+            break;
+    }
+
+    return "";
 }
 
 bool WeaponInventory::LevelUpAllWeapons() {
@@ -151,11 +186,56 @@ std::string WeaponInventory::GetDisplayNames() const {
         if (i > 0) {
             stream << ", ";
         }
-        stream << m_Weapons[i]->GetDisplayName() << " Lv."
-               << m_Weapons[i]->GetLevel();
+        stream << m_Weapons[i]->GetDisplayName();
+        if (m_Weapons[i]->IsEvolved()) {
+            stream << " EVO";
+        } else {
+            stream << " Lv." << m_Weapons[i]->GetLevel();
+        }
     }
 
     return stream.str();
+}
+
+void WeaponInventory::ApplyWeaponPassiveHistory(
+    Weapon &weapon, const UpgradeManager &upgrades) const {
+    weapon.IncreaseDamage(
+        upgrades.GetPassiveUpgradeLevel(PassiveUpgradeType::WeaponDamage));
+
+    for (int i = 0;
+         i < upgrades.GetPassiveUpgradeLevel(PassiveUpgradeType::WeaponCooldown);
+         ++i) {
+        weapon.MultiplyCooldown(0.86F);
+    }
+
+    weapon.IncreaseProjectileCount(
+        upgrades.GetPassiveUpgradeLevel(PassiveUpgradeType::ProjectileCount));
+}
+
+bool WeaponInventory::CanEvolveMagicBolt(
+    const UpgradeManager &upgrades) const {
+    const Weapon *weapon = FindWeapon(WeaponType::MagicBolt);
+    return weapon != nullptr && !weapon->CanLevelUp() &&
+           upgrades.HasPassiveUpgradeLevel(PassiveUpgradeType::WeaponDamage, 3);
+}
+
+bool WeaponInventory::ReplaceWeapon(WeaponType originalType,
+                                    std::unique_ptr<Weapon> evolvedWeapon) {
+    if (evolvedWeapon == nullptr) {
+        return false;
+    }
+
+    const auto it =
+        std::find_if(m_Weapons.begin(), m_Weapons.end(),
+                     [originalType](const auto &weapon) {
+                         return weapon->GetType() == originalType;
+                     });
+    if (it == m_Weapons.end()) {
+        return false;
+    }
+
+    *it = std::move(evolvedWeapon);
+    return true;
 }
 
 Weapon *WeaponInventory::FindWeapon(WeaponType type) {
@@ -180,6 +260,8 @@ std::unique_ptr<Weapon> WeaponInventory::CreateWeapon(WeaponType type) const {
             return std::make_unique<ArcaneNovaWeapon>(m_FontPath);
         case WeaponType::OrbitingShield:
             return std::make_unique<OrbitingShieldWeapon>(m_FontPath);
+        case WeaponType::RunicLance:
+            return std::make_unique<RunicLanceWeapon>(m_FontPath);
         default:
             return nullptr;
     }

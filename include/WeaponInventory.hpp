@@ -10,6 +10,7 @@
 class Enemy;
 class Player;
 class Projectile;
+class UpgradeManager;
 
 class WeaponInventory {
 public:
@@ -19,6 +20,8 @@ public:
     bool UnlockWeapon(WeaponType type);
     bool LevelUpWeapon(WeaponType type);
     std::string LevelUpRandomWeapon(std::mt19937 &rng);
+    std::string EvolveRandomWeapon(std::mt19937 &rng,
+                                   const UpgradeManager &upgrades);
     bool LevelUpAllWeapons();
     bool HasWeapon(WeaponType type) const;
     bool CanLevelUpWeapon(WeaponType type) const;
@@ -40,6 +43,11 @@ public:
     std::size_t GetWeaponCount() const { return m_Weapons.size(); }
 
 private:
+    void ApplyWeaponPassiveHistory(Weapon &weapon,
+                                   const UpgradeManager &upgrades) const;
+    bool CanEvolveMagicBolt(const UpgradeManager &upgrades) const;
+    bool ReplaceWeapon(WeaponType originalType,
+                       std::unique_ptr<Weapon> evolvedWeapon);
     Weapon *FindWeapon(WeaponType type);
     const Weapon *FindWeapon(WeaponType type) const;
     std::unique_ptr<Weapon> CreateWeapon(WeaponType type) const;

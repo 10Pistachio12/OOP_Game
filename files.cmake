@@ -19,6 +19,7 @@ set(SRC_FILES
     PlayerMarker.cpp
     Projectile.cpp
     RewardChest.cpp
+    RunicLanceWeapon.cpp
     SlimeEnemy.cpp
     Upgrade.cpp
     UpgradeManager.cpp
@@ -47,6 +48,7 @@ set(INCLUDE_FILES
     PlayerMarker.hpp
     Projectile.hpp
     RewardChest.hpp
+    RunicLanceWeapon.hpp
     SlimeEnemy.hpp
     SpriteAssets.hpp
     Upgrade.hpp

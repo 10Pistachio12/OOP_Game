@@ -466,10 +466,17 @@ void GameScene::OpenRewardChest(const std::shared_ptr<RewardChest> &chest) {
         return;
     }
 
-    const std::string weaponReward = m_Weapons->LevelUpRandomWeapon(m_Rng);
+    const std::string weaponReward =
+        m_Weapons->EvolveRandomWeapon(m_Rng, *m_UpgradeManager);
     if (!weaponReward.empty()) {
         m_LastRewardText = "Chest Reward: " + weaponReward;
         SpawnFloatingText("Chest: " + weaponReward, chest->GetPosition(),
+                          Util::Color(255, 220, 80), 1.2F);
+    } else if (const std::string levelReward =
+                   m_Weapons->LevelUpRandomWeapon(m_Rng);
+               !levelReward.empty()) {
+        m_LastRewardText = "Chest Reward: " + levelReward;
+        SpawnFloatingText("Chest: " + levelReward, chest->GetPosition(),
                           Util::Color(255, 220, 80), 1.2F);
     } else {
         m_Player->Heal(2);

@@ -11,6 +11,7 @@ enum class WeaponType {
     MagicBolt,
     ArcaneNova,
     OrbitingShield,
+    RunicLance,
 };
 
 inline std::string GetWeaponTypeDisplayName(WeaponType type) {
@@ -21,6 +22,8 @@ inline std::string GetWeaponTypeDisplayName(WeaponType type) {
             return "Arcane Nova";
         case WeaponType::OrbitingShield:
             return "Orbiting Shield";
+        case WeaponType::RunicLance:
+            return "Runic Lance";
         default:
             return "Unknown Weapon";
     }
@@ -47,6 +50,7 @@ public:
     virtual void IncreaseProjectileCount(int amount) {
         m_BonusProjectileCount += amount;
     }
+    virtual bool IsEvolved() const { return false; }
 
     bool LevelUp() {
         if (!CanLevelUp()) {
