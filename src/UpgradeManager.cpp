@@ -10,6 +10,10 @@ struct UpgradeCandidate {
     int weight = 1;
 };
 
+std::size_t ToIndex(PassiveUpgradeType type) {
+    return static_cast<std::size_t>(type);
+}
+
 void AddCandidate(std::vector<UpgradeCandidate> &candidates,
                   std::shared_ptr<Upgrade> upgrade, int weight) {
     if (weight <= 0) {
@@ -50,12 +54,48 @@ UpgradeManager::UpgradeManager(std::mt19937 &rng)
 std::vector<std::shared_ptr<Upgrade>> UpgradeManager::GenerateChoices(
     std::size_t count, const WeaponInventory &weapons) {
     std::vector<UpgradeCandidate> candidates;
-    AddCandidate(candidates, std::make_shared<MoveSpeedUpgrade>(), 12);
-    AddCandidate(candidates, std::make_shared<MaxHealthUpgrade>(), 14);
-    AddCandidate(candidates, std::make_shared<PickupRangeUpgrade>(), 10);
-    AddCandidate(candidates, std::make_shared<WeaponDamageUpgrade>(), 15);
-    AddCandidate(candidates, std::make_shared<WeaponCooldownUpgrade>(), 14);
-    AddCandidate(candidates, std::make_shared<ProjectileCountUpgrade>(), 7);
+    const auto addPassiveCandidate =
+        [&](PassiveUpgradeType type, int weight, const auto &factory) {
+            const int maxLevel = GetPassiveUpgradeMaxLevel(type);
+            const int currentLevel = GetPassiveUpgradeLevel(type);
+            if (currentLevel >= maxLevel) {
+                return;
+            }
+
+            AddCandidate(candidates, factory(currentLevel + 1, maxLevel),
+                         weight);
+        };
+
+    addPassiveCandidate(PassiveUpgradeType::MoveSpeed, 12,
+                        [](int nextLevel, int maxLevel) {
+                            return std::make_shared<MoveSpeedUpgrade>(
+                                nextLevel, maxLevel);
+                        });
+    addPassiveCandidate(PassiveUpgradeType::MaxHealth, 14,
+                        [](int nextLevel, int maxLevel) {
+                            return std::make_shared<MaxHealthUpgrade>(
+                                nextLevel, maxLevel);
+                        });
+    addPassiveCandidate(PassiveUpgradeType::PickupRange, 10,
+                        [](int nextLevel, int maxLevel) {
+                            return std::make_shared<PickupRangeUpgrade>(
+                                nextLevel, maxLevel);
+                        });
+    addPassiveCandidate(PassiveUpgradeType::WeaponDamage, 15,
+                        [](int nextLevel, int maxLevel) {
+                            return std::make_shared<WeaponDamageUpgrade>(
+                                nextLevel, maxLevel);
+                        });
+    addPassiveCandidate(PassiveUpgradeType::WeaponCooldown, 14,
+                        [](int nextLevel, int maxLevel) {
+                            return std::make_shared<WeaponCooldownUpgrade>(
+                                nextLevel, maxLevel);
+                        });
+    addPassiveCandidate(PassiveUpgradeType::ProjectileCount, 7,
+                        [](int nextLevel, int maxLevel) {
+                            return std::make_shared<ProjectileCountUpgrade>(
+                                nextLevel, maxLevel);
+                        });
 
     for (WeaponType type : weapons.GetOwnedWeaponTypes()) {
         if (!weapons.CanLevelUpWeapon(type)) {
@@ -83,6 +123,11 @@ std::vector<std::shared_ptr<Upgrade>> UpgradeManager::GenerateChoices(
                      11);
     }
 
+    if (candidates.empty()) {
+        AddCandidate(candidates, std::make_shared<OverflowRecoveryUpgrade>(),
+                     1);
+    }
+
     std::vector<std::shared_ptr<Upgrade>> choices;
     while (choices.size() < count && !candidates.empty()) {
         const std::size_t selectedIndex = PickWeightedIndex(candidates, m_Rng);
@@ -92,4 +137,23 @@ std::vector<std::shared_ptr<Upgrade>> UpgradeManager::GenerateChoices(
     }
 
     return choices;
+}
+
+void UpgradeManager::RecordApplied(const Upgrade &upgrade) {
+    const PassiveUpgradeType type = upgrade.GetPassiveType();
+    if (type == PassiveUpgradeType::None || type == PassiveUpgradeType::Count) {
+        return;
+    }
+
+    const int maxLevel = GetPassiveUpgradeMaxLevel(type);
+    int &currentLevel = m_PassiveUpgradeLevels[ToIndex(type)];
+    currentLevel = std::min(maxLevel, currentLevel + 1);
+}
+
+int UpgradeManager::GetPassiveUpgradeLevel(PassiveUpgradeType type) const {
+    if (type == PassiveUpgradeType::None || type == PassiveUpgradeType::Count) {
+        return 0;
+    }
+
+    return m_PassiveUpgradeLevels[ToIndex(type)];
 }

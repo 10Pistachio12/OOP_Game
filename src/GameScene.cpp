@@ -247,6 +247,7 @@ void GameScene::HandleLevelUpInput() {
         m_UpgradeChoices[static_cast<std::size_t>(selectedIndex)];
     const std::string selectedName = selectedChoice->GetName();
     selectedChoice->Apply(*m_Player, *m_Weapons);
+    m_UpgradeManager->RecordApplied(*selectedChoice);
     --m_PendingLevelUps;
 
     if (m_PendingLevelUps > 0) {

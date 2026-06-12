@@ -14,7 +14,19 @@ enum class UpgradeRarity {
     Rare,
 };
 
+enum class PassiveUpgradeType {
+    None = 0,
+    MoveSpeed,
+    MaxHealth,
+    PickupRange,
+    WeaponDamage,
+    WeaponCooldown,
+    ProjectileCount,
+    Count,
+};
+
 std::string GetUpgradeRarityLabel(UpgradeRarity rarity);
+int GetPassiveUpgradeMaxLevel(PassiveUpgradeType type);
 
 class Upgrade {
 public:
@@ -23,51 +35,90 @@ public:
     virtual std::string GetName() const = 0;
     virtual std::string GetDescription() const = 0;
     virtual UpgradeRarity GetRarity() const { return UpgradeRarity::Common; }
+    virtual PassiveUpgradeType GetPassiveType() const {
+        return PassiveUpgradeType::None;
+    }
     virtual void Apply(Player &player, WeaponInventory &weapons) const = 0;
 };
 
-class MoveSpeedUpgrade final : public Upgrade {
+class PassiveUpgrade : public Upgrade {
 public:
-    std::string GetName() const override { return "Swift Feet"; }
-    std::string GetDescription() const override { return "+35 move speed"; }
+    PassiveUpgrade(PassiveUpgradeType type, int nextLevel, int maxLevel);
+
+    PassiveUpgradeType GetPassiveType() const override { return m_Type; }
+
+protected:
+    std::string FormatLeveledName(const std::string &baseName) const;
+
+private:
+    PassiveUpgradeType m_Type = PassiveUpgradeType::None;
+    int m_NextLevel = 1;
+    int m_MaxLevel = 1;
+};
+
+class MoveSpeedUpgrade final : public PassiveUpgrade {
+public:
+    MoveSpeedUpgrade(int nextLevel, int maxLevel);
+
+    std::string GetName() const override;
+    std::string GetDescription() const override;
     void Apply(Player &player, WeaponInventory &weapons) const override;
 };
 
-class MaxHealthUpgrade final : public Upgrade {
+class MaxHealthUpgrade final : public PassiveUpgrade {
 public:
-    std::string GetName() const override { return "Vital Core"; }
-    std::string GetDescription() const override { return "+2 max HP and heal 2"; }
+    MaxHealthUpgrade(int nextLevel, int maxLevel);
+
+    std::string GetName() const override;
+    std::string GetDescription() const override;
     void Apply(Player &player, WeaponInventory &weapons) const override;
 };
 
-class PickupRangeUpgrade final : public Upgrade {
+class PickupRangeUpgrade final : public PassiveUpgrade {
 public:
-    std::string GetName() const override { return "Magnet Pulse"; }
-    std::string GetDescription() const override { return "+28 pickup range"; }
+    PickupRangeUpgrade(int nextLevel, int maxLevel);
+
+    std::string GetName() const override;
+    std::string GetDescription() const override;
     void Apply(Player &player, WeaponInventory &weapons) const override;
 };
 
-class WeaponDamageUpgrade final : public Upgrade {
+class WeaponDamageUpgrade final : public PassiveUpgrade {
 public:
-    std::string GetName() const override { return "Sharper Arsenal"; }
-    std::string GetDescription() const override { return "+1 damage to all weapons"; }
+    WeaponDamageUpgrade(int nextLevel, int maxLevel);
+
+    std::string GetName() const override;
+    std::string GetDescription() const override;
     UpgradeRarity GetRarity() const override { return UpgradeRarity::Uncommon; }
     void Apply(Player &player, WeaponInventory &weapons) const override;
 };
 
-class WeaponCooldownUpgrade final : public Upgrade {
+class WeaponCooldownUpgrade final : public PassiveUpgrade {
 public:
-    std::string GetName() const override { return "Quick Cast"; }
-    std::string GetDescription() const override { return "-14% cooldown on all weapons"; }
+    WeaponCooldownUpgrade(int nextLevel, int maxLevel);
+
+    std::string GetName() const override;
+    std::string GetDescription() const override;
     UpgradeRarity GetRarity() const override { return UpgradeRarity::Uncommon; }
     void Apply(Player &player, WeaponInventory &weapons) const override;
 };
 
-class ProjectileCountUpgrade final : public Upgrade {
+class ProjectileCountUpgrade final : public PassiveUpgrade {
 public:
-    std::string GetName() const override { return "Twin Casting"; }
-    std::string GetDescription() const override { return "+1 projectile pattern to all weapons"; }
+    ProjectileCountUpgrade(int nextLevel, int maxLevel);
+
+    std::string GetName() const override;
+    std::string GetDescription() const override;
     UpgradeRarity GetRarity() const override { return UpgradeRarity::Rare; }
+    void Apply(Player &player, WeaponInventory &weapons) const override;
+};
+
+class OverflowRecoveryUpgrade final : public Upgrade {
+public:
+    std::string GetName() const override { return "Second Wind"; }
+    std::string GetDescription() const override {
+        return "+4 HP when primary upgrades are capped";
+    }
     void Apply(Player &player, WeaponInventory &weapons) const override;
 };
 
