@@ -24,6 +24,7 @@ public:
                                    const UpgradeManager &upgrades);
     bool LevelUpAllWeapons();
     bool HasWeapon(WeaponType type) const;
+    bool HasOpenWeaponSlot() const;
     bool CanLevelUpWeapon(WeaponType type) const;
     int GetWeaponLevel(WeaponType type) const;
     int GetWeaponMaxLevel(WeaponType type) const;
@@ -42,8 +43,11 @@ public:
     std::string GetDisplayNames() const;
     std::string GetEvolutionStatus(const UpgradeManager &upgrades) const;
     std::size_t GetWeaponCount() const { return m_Weapons.size(); }
+    std::size_t GetMaxWeaponSlots() const { return MAX_WEAPON_SLOTS; }
 
 private:
+    static constexpr std::size_t MAX_WEAPON_SLOTS = 6;
+
     void ApplyWeaponPassiveHistory(Weapon &weapon,
                                    const UpgradeManager &upgrades) const;
     bool CanEvolveArcaneNova(const UpgradeManager &upgrades) const;

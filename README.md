@@ -26,6 +26,7 @@ upgrades on level up.
 - XP gems are magnetized toward the player within pickup range.
 - Taking contact damage grants a brief invulnerability flash.
 - Level-up choices use weighted rarity tiers for character stats, all-weapon bonuses, weapon unlocks, and weapon level-ups.
+- Weapon and passive slots are capped at 6 each, matching the genre's build-planning structure.
 - Passive upgrades show Lv.X/Y and stop appearing after reaching their cap.
 - HUD shows weapon evolution requirements and when an elite chest can trigger evolution.
 - HUD shows HP, level, XP, survival time, wave phase, kills, elite countdown, and weapon levels.

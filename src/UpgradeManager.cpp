@@ -58,7 +58,7 @@ std::vector<std::shared_ptr<Upgrade>> UpgradeManager::GenerateChoices(
         [&](PassiveUpgradeType type, int weight, const auto &factory) {
             const int maxLevel = GetPassiveUpgradeMaxLevel(type);
             const int currentLevel = GetPassiveUpgradeLevel(type);
-            if (currentLevel >= maxLevel) {
+            if (currentLevel >= maxLevel || !CanOfferPassiveUpgrade(type)) {
                 return;
             }
 
@@ -109,14 +109,16 @@ std::vector<std::shared_ptr<Upgrade>> UpgradeManager::GenerateChoices(
                      GetWeaponLevelWeight(weapons, type));
     }
 
-    if (!weapons.HasWeapon(WeaponType::ArcaneNova)) {
+    if (!weapons.HasWeapon(WeaponType::ArcaneNova) &&
+        weapons.HasOpenWeaponSlot()) {
         AddCandidate(candidates,
                      std::make_shared<UnlockWeaponUpgrade>(
                          WeaponType::ArcaneNova),
                      11);
     }
 
-    if (!weapons.HasWeapon(WeaponType::OrbitingShield)) {
+    if (!weapons.HasWeapon(WeaponType::OrbitingShield) &&
+        weapons.HasOpenWeaponSlot()) {
         AddCandidate(candidates,
                      std::make_shared<UnlockWeaponUpgrade>(
                          WeaponType::OrbitingShield),
@@ -158,7 +160,24 @@ int UpgradeManager::GetPassiveUpgradeLevel(PassiveUpgradeType type) const {
     return m_PassiveUpgradeLevels[ToIndex(type)];
 }
 
+int UpgradeManager::GetPassiveSlotCount() const {
+    int count = 0;
+    for (std::size_t i = ToIndex(PassiveUpgradeType::MoveSpeed);
+         i < ToIndex(PassiveUpgradeType::Count); ++i) {
+        if (m_PassiveUpgradeLevels[i] > 0) {
+            ++count;
+        }
+    }
+
+    return count;
+}
+
 bool UpgradeManager::HasPassiveUpgradeLevel(PassiveUpgradeType type,
                                             int requiredLevel) const {
     return GetPassiveUpgradeLevel(type) >= requiredLevel;
+}
+
+bool UpgradeManager::CanOfferPassiveUpgrade(PassiveUpgradeType type) const {
+    const int currentLevel = GetPassiveUpgradeLevel(type);
+    return currentLevel > 0 || GetPassiveSlotCount() < MAX_PASSIVE_SLOTS;
 }

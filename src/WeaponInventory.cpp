@@ -30,7 +30,7 @@ void WeaponInventory::AddWeapon(std::unique_ptr<Weapon> weapon) {
 }
 
 bool WeaponInventory::UnlockWeapon(WeaponType type) {
-    if (HasWeapon(type)) {
+    if (HasWeapon(type) || !HasOpenWeaponSlot()) {
         return false;
     }
 
@@ -130,6 +130,10 @@ bool WeaponInventory::LevelUpAllWeapons() {
 
 bool WeaponInventory::HasWeapon(WeaponType type) const {
     return FindWeapon(type) != nullptr;
+}
+
+bool WeaponInventory::HasOpenWeaponSlot() const {
+    return m_Weapons.size() < MAX_WEAPON_SLOTS;
 }
 
 bool WeaponInventory::CanLevelUpWeapon(WeaponType type) const {

@@ -695,6 +695,10 @@ void GameScene::UpdateHud() const {
     stream << "Phase: " << m_EnemyDirector->GetPhaseName(m_SurvivalTime)
            << "  Magnet: " << static_cast<int>(m_Player->GetPickupRadius())
            << '\n';
+    stream << "Slots: Weapons " << m_Weapons->GetWeaponCount() << "/"
+           << m_Weapons->GetMaxWeaponSlots()
+           << "  Passives: " << m_UpgradeManager->GetPassiveSlotCount() << "/"
+           << m_UpgradeManager->GetMaxPassiveSlots() << '\n';
     stream << "Evolution: " << m_Weapons->GetEvolutionStatus(*m_UpgradeManager)
            << '\n';
     stream << "Kills: " << m_KillCount << "  Elites: " << m_EliteKills
