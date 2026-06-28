@@ -461,33 +461,52 @@ void GameScene::SpawnFloatingText(const std::string &content,
     m_Renderer.AddChild(text);
 }
 
+void GameScene::PresentChestReward(const ChestRewardResult &reward,
+                                   const glm::vec2 &position) {
+    if (reward.kind == ChestRewardKind::WeaponEvolution) {
+        SpawnFloatingText(reward.titleText, position + glm::vec2(0.0F, 58.0F),
+                          Util::Color(120, 255, 230), 1.65F);
+        SpawnFloatingText(reward.detailText,
+                          position + glm::vec2(0.0F, 32.0F),
+                          Util::Color(255, 235, 105), 1.45F);
+        SpawnFloatingText("Power awakened",
+                          position + glm::vec2(0.0F, 8.0F),
+                          Util::Color(180, 225, 255), 1.2F);
+
+        const std::array<glm::vec2, 8> sparkleOffsets{
+            glm::vec2{-42.0F, 28.0F}, glm::vec2{-24.0F, 52.0F},
+            glm::vec2{24.0F, 52.0F},  glm::vec2{42.0F, 28.0F},
+            glm::vec2{-46.0F, -6.0F}, glm::vec2{-18.0F, -26.0F},
+            glm::vec2{18.0F, -26.0F}, glm::vec2{46.0F, -6.0F},
+        };
+        for (const auto &offset : sparkleOffsets) {
+            SpawnFloatingText("*", position + offset,
+                              Util::Color(130, 255, 245), 0.85F);
+        }
+        return;
+    }
+
+    const Util::Color rewardColor =
+        reward.kind == ChestRewardKind::WeaponLevel
+            ? Util::Color(255, 220, 80)
+            : Util::Color(120, 245, 170);
+    SpawnFloatingText(reward.titleText + ": " + reward.detailText, position,
+                      rewardColor, 1.2F);
+}
+
 void GameScene::OpenRewardChest(const std::shared_ptr<RewardChest> &chest) {
     if (!chest->IsAlive()) {
         return;
     }
 
-    const std::string weaponReward =
-        m_Weapons->EvolveRandomWeapon(m_Rng, *m_UpgradeManager);
-    if (!weaponReward.empty()) {
-        m_LastRewardText = "Chest Reward: " + weaponReward;
-        SpawnFloatingText("Chest: " + weaponReward, chest->GetPosition(),
-                          Util::Color(255, 220, 80), 1.2F);
-    } else if (const std::string levelReward =
-                   m_Weapons->LevelUpRandomWeapon(m_Rng);
-               !levelReward.empty()) {
-        m_LastRewardText = "Chest Reward: " + levelReward;
-        SpawnFloatingText("Chest: " + levelReward, chest->GetPosition(),
-                          Util::Color(255, 220, 80), 1.2F);
-    } else {
-        m_Player->Heal(2);
-        const int levelUps = m_Player->GainExperience(8);
-        m_LastRewardText = "Chest Reward: +8 XP and heal 2";
-        SpawnFloatingText("+8 XP  +2 HP", chest->GetPosition(),
-                          Util::Color(255, 220, 80), 1.2F);
-        if (levelUps > 0 && m_Status == Status::RUNNING) {
-            m_PendingLevelUps += levelUps;
-            EnterLevelUp();
-        }
+    const ChestRewardResult reward = RewardSystem::OpenRewardChest(
+        *m_Player, *m_Weapons, *m_UpgradeManager, m_Rng);
+    m_LastRewardText = reward.hudText;
+    PresentChestReward(reward, chest->GetPosition());
+
+    if (reward.levelUps > 0 && m_Status == Status::RUNNING) {
+        m_PendingLevelUps += reward.levelUps;
+        EnterLevelUp();
     }
 
     ++m_ChestsOpened;

@@ -15,6 +15,7 @@
 #include "PlayerMarker.hpp"
 #include "Projectile.hpp"
 #include "RewardChest.hpp"
+#include "RewardSystem.hpp"
 #include "UpgradeManager.hpp"
 #include "Util/Renderer.hpp"
 #include "WeaponInventory.hpp"
@@ -64,6 +65,8 @@ private:
                            const glm::vec2 &position,
                            const Util::Color &color,
                            float lifetimeSeconds = 0.75F);
+    void PresentChestReward(const ChestRewardResult &reward,
+                            const glm::vec2 &position);
     void OpenRewardChest(const std::shared_ptr<RewardChest> &chest);
     void HandleCollisions();
     void CleanupDestroyed();

@@ -15,6 +15,7 @@ upgrades on level up.
 - Magic Bolt can evolve into Runic Lance after reaching max level with Sharper Arsenal Lv.3.
 - Arcane Nova can evolve into Starfall Nova after reaching max level with Quick Cast Lv.3.
 - Orbiting Shield adds close-range rotating guard orbs around the player.
+- Evolved chest rewards show a stronger multi-line reward presentation.
 - Early power growth includes projectile-count upgrades for stronger clearing.
 - Placeholder sprites are used for the player, enemies, projectiles, gems, and chests.
 - A subtle player outline keeps the character readable during dense combat.

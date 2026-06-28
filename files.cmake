@@ -19,6 +19,7 @@ set(SRC_FILES
     PlayerMarker.cpp
     Projectile.cpp
     RewardChest.cpp
+    RewardSystem.cpp
     RunicLanceWeapon.cpp
     SlimeEnemy.cpp
     StarfallNovaWeapon.cpp
@@ -49,6 +50,7 @@ set(INCLUDE_FILES
     PlayerMarker.hpp
     Projectile.hpp
     RewardChest.hpp
+    RewardSystem.hpp
     RunicLanceWeapon.hpp
     SlimeEnemy.hpp
     StarfallNovaWeapon.hpp
