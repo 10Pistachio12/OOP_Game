@@ -13,6 +13,7 @@ upgrades on level up.
 - Each weapon has levels and weapon-specific upgrade effects.
 - Auto-targeting Magic Bolt weapon and radial Arcane Nova burst weapon.
 - Magic Bolt can evolve into Runic Lance after reaching max level with Sharper Arsenal Lv.3.
+- Arcane Nova can evolve into Starfall Nova after reaching max level with Quick Cast Lv.3.
 - Orbiting Shield adds close-range rotating guard orbs around the player.
 - Early power growth includes projectile-count upgrades for stronger clearing.
 - Placeholder sprites are used for the player, enemies, projectiles, gems, and chests.

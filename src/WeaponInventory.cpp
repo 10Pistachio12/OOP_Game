@@ -7,10 +7,12 @@
 #include "MagicBoltWeapon.hpp"
 #include "OrbitingShieldWeapon.hpp"
 #include "RunicLanceWeapon.hpp"
+#include "StarfallNovaWeapon.hpp"
 #include "UpgradeManager.hpp"
 
 namespace {
 constexpr int MAGIC_BOLT_EVOLUTION_DAMAGE_LEVEL = 3;
+constexpr int ARCANE_NOVA_EVOLUTION_COOLDOWN_LEVEL = 3;
 }
 
 WeaponInventory::WeaponInventory(std::string fontPath)
@@ -77,6 +79,9 @@ std::string WeaponInventory::EvolveRandomWeapon(
     if (CanEvolveMagicBolt(upgrades)) {
         candidates.push_back(WeaponType::MagicBolt);
     }
+    if (CanEvolveArcaneNova(upgrades)) {
+        candidates.push_back(WeaponType::ArcaneNova);
+    }
 
     if (candidates.empty()) {
         return "";
@@ -94,6 +99,16 @@ std::string WeaponInventory::EvolveRandomWeapon(
             if (ReplaceWeapon(WeaponType::MagicBolt,
                               std::move(evolvedWeapon))) {
                 return "Magic Bolt evolved into Runic Lance";
+            }
+            break;
+        }
+        case WeaponType::ArcaneNova: {
+            auto evolvedWeapon =
+                std::make_unique<StarfallNovaWeapon>(m_FontPath);
+            ApplyWeaponPassiveHistory(*evolvedWeapon, upgrades);
+            if (ReplaceWeapon(WeaponType::ArcaneNova,
+                              std::move(evolvedWeapon))) {
+                return "Arcane Nova evolved into Starfall Nova";
             }
             break;
         }
@@ -203,30 +218,63 @@ std::string WeaponInventory::GetDisplayNames() const {
 
 std::string WeaponInventory::GetEvolutionStatus(
     const UpgradeManager &upgrades) const {
+    std::vector<std::string> statuses;
+
     if (HasWeapon(WeaponType::RunicLance)) {
-        return "Runic Lance evolved";
+        statuses.push_back("Runic Lance evolved");
+    } else {
+        const Weapon *magicBolt = FindWeapon(WeaponType::MagicBolt);
+        if (magicBolt == nullptr) {
+            statuses.push_back("Magic Bolt not owned");
+        } else if (CanEvolveMagicBolt(upgrades)) {
+            statuses.push_back(
+                "Magic Bolt -> Runic Lance: READY - open an elite chest");
+        } else {
+            std::ostringstream stream;
+            const int damageLevel =
+                upgrades.GetPassiveUpgradeLevel(
+                    PassiveUpgradeType::WeaponDamage);
+            stream << "Magic Bolt -> Runic Lance: Magic Bolt Lv."
+                   << magicBolt->GetLevel() << "/" << magicBolt->GetMaxLevel()
+                   << ", Sharper Arsenal Lv."
+                   << std::min(damageLevel,
+                               MAGIC_BOLT_EVOLUTION_DAMAGE_LEVEL)
+                   << "/" << MAGIC_BOLT_EVOLUTION_DAMAGE_LEVEL;
+            statuses.push_back(stream.str());
+        }
     }
 
-    const Weapon *magicBolt = FindWeapon(WeaponType::MagicBolt);
-    if (magicBolt == nullptr) {
-        return "Magic Bolt not owned";
+    if (HasWeapon(WeaponType::StarfallNova)) {
+        statuses.push_back("Starfall Nova evolved");
+    } else {
+        const Weapon *arcaneNova = FindWeapon(WeaponType::ArcaneNova);
+        if (arcaneNova == nullptr) {
+            statuses.push_back("Arcane Nova not owned");
+        } else if (CanEvolveArcaneNova(upgrades)) {
+            statuses.push_back(
+                "Arcane Nova -> Starfall Nova: READY - open an elite chest");
+        } else {
+            std::ostringstream stream;
+            const int cooldownLevel =
+                upgrades.GetPassiveUpgradeLevel(
+                    PassiveUpgradeType::WeaponCooldown);
+            stream << "Arcane Nova -> Starfall Nova: Arcane Nova Lv."
+                   << arcaneNova->GetLevel() << "/"
+                   << arcaneNova->GetMaxLevel() << ", Quick Cast Lv."
+                   << std::min(cooldownLevel,
+                               ARCANE_NOVA_EVOLUTION_COOLDOWN_LEVEL)
+                   << "/" << ARCANE_NOVA_EVOLUTION_COOLDOWN_LEVEL;
+            statuses.push_back(stream.str());
+        }
     }
 
     std::ostringstream stream;
-    stream << "Magic Bolt -> Runic Lance: ";
-    if (CanEvolveMagicBolt(upgrades)) {
-        stream << "READY - open an elite chest";
-        return stream.str();
+    for (std::size_t i = 0; i < statuses.size(); ++i) {
+        if (i > 0) {
+            stream << "\n           ";
+        }
+        stream << statuses[i];
     }
-
-    const int weaponLevel = magicBolt->GetLevel();
-    const int weaponMaxLevel = magicBolt->GetMaxLevel();
-    const int damageLevel =
-        upgrades.GetPassiveUpgradeLevel(PassiveUpgradeType::WeaponDamage);
-    stream << "Magic Bolt Lv." << weaponLevel << "/" << weaponMaxLevel
-           << ", Sharper Arsenal Lv."
-           << std::min(damageLevel, MAGIC_BOLT_EVOLUTION_DAMAGE_LEVEL) << "/"
-           << MAGIC_BOLT_EVOLUTION_DAMAGE_LEVEL;
 
     return stream.str();
 }
@@ -253,6 +301,15 @@ bool WeaponInventory::CanEvolveMagicBolt(
            upgrades.HasPassiveUpgradeLevel(
                PassiveUpgradeType::WeaponDamage,
                MAGIC_BOLT_EVOLUTION_DAMAGE_LEVEL);
+}
+
+bool WeaponInventory::CanEvolveArcaneNova(
+    const UpgradeManager &upgrades) const {
+    const Weapon *weapon = FindWeapon(WeaponType::ArcaneNova);
+    return weapon != nullptr && !weapon->CanLevelUp() &&
+           upgrades.HasPassiveUpgradeLevel(
+               PassiveUpgradeType::WeaponCooldown,
+               ARCANE_NOVA_EVOLUTION_COOLDOWN_LEVEL);
 }
 
 bool WeaponInventory::ReplaceWeapon(WeaponType originalType,
@@ -298,6 +355,8 @@ std::unique_ptr<Weapon> WeaponInventory::CreateWeapon(WeaponType type) const {
             return std::make_unique<OrbitingShieldWeapon>(m_FontPath);
         case WeaponType::RunicLance:
             return std::make_unique<RunicLanceWeapon>(m_FontPath);
+        case WeaponType::StarfallNova:
+            return std::make_unique<StarfallNovaWeapon>(m_FontPath);
         default:
             return nullptr;
     }

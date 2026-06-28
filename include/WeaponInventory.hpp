@@ -46,6 +46,7 @@ public:
 private:
     void ApplyWeaponPassiveHistory(Weapon &weapon,
                                    const UpgradeManager &upgrades) const;
+    bool CanEvolveArcaneNova(const UpgradeManager &upgrades) const;
     bool CanEvolveMagicBolt(const UpgradeManager &upgrades) const;
     bool ReplaceWeapon(WeaponType originalType,
                        std::unique_ptr<Weapon> evolvedWeapon);

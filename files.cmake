@@ -21,6 +21,7 @@ set(SRC_FILES
     RewardChest.cpp
     RunicLanceWeapon.cpp
     SlimeEnemy.cpp
+    StarfallNovaWeapon.cpp
     Upgrade.cpp
     UpgradeManager.cpp
     WeaponInventory.cpp
@@ -50,6 +51,7 @@ set(INCLUDE_FILES
     RewardChest.hpp
     RunicLanceWeapon.hpp
     SlimeEnemy.hpp
+    StarfallNovaWeapon.hpp
     SpriteAssets.hpp
     Upgrade.hpp
     UpgradeManager.hpp
