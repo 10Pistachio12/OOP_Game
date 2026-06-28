@@ -1,4 +1,5 @@
 set(SRC_FILES
+    AegisHaloWeapon.cpp
     App.cpp
     ArcaneNovaWeapon.cpp
     BatEnemy.cpp
@@ -29,6 +30,7 @@ set(SRC_FILES
 )
 
 set(INCLUDE_FILES
+    AegisHaloWeapon.hpp
     App.hpp
     ArcaneNovaWeapon.hpp
     BatEnemy.hpp

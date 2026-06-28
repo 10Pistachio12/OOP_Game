@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <sstream>
 
+#include "AegisHaloWeapon.hpp"
 #include "ArcaneNovaWeapon.hpp"
 #include "MagicBoltWeapon.hpp"
 #include "OrbitingShieldWeapon.hpp"
@@ -13,6 +14,7 @@
 namespace {
 constexpr int MAGIC_BOLT_EVOLUTION_DAMAGE_LEVEL = 3;
 constexpr int ARCANE_NOVA_EVOLUTION_COOLDOWN_LEVEL = 3;
+constexpr int ORBITING_SHIELD_EVOLUTION_HEALTH_LEVEL = 3;
 }
 
 WeaponInventory::WeaponInventory(std::string fontPath)
@@ -82,6 +84,9 @@ std::string WeaponInventory::EvolveRandomWeapon(
     if (CanEvolveArcaneNova(upgrades)) {
         candidates.push_back(WeaponType::ArcaneNova);
     }
+    if (CanEvolveOrbitingShield(upgrades)) {
+        candidates.push_back(WeaponType::OrbitingShield);
+    }
 
     if (candidates.empty()) {
         return "";
@@ -109,6 +114,15 @@ std::string WeaponInventory::EvolveRandomWeapon(
             if (ReplaceWeapon(WeaponType::ArcaneNova,
                               std::move(evolvedWeapon))) {
                 return "Arcane Nova evolved into Starfall Nova";
+            }
+            break;
+        }
+        case WeaponType::OrbitingShield: {
+            auto evolvedWeapon = std::make_unique<AegisHaloWeapon>(m_FontPath);
+            ApplyWeaponPassiveHistory(*evolvedWeapon, upgrades);
+            if (ReplaceWeapon(WeaponType::OrbitingShield,
+                              std::move(evolvedWeapon))) {
+                return "Orbiting Shield evolved into Aegis Halo";
             }
             break;
         }
@@ -272,6 +286,30 @@ std::string WeaponInventory::GetEvolutionStatus(
         }
     }
 
+    if (HasWeapon(WeaponType::AegisHalo)) {
+        statuses.push_back("Aegis Halo evolved");
+    } else {
+        const Weapon *orbitingShield = FindWeapon(WeaponType::OrbitingShield);
+        if (orbitingShield == nullptr) {
+            statuses.push_back("Orbiting Shield not owned");
+        } else if (CanEvolveOrbitingShield(upgrades)) {
+            statuses.push_back(
+                "Orbiting Shield -> Aegis Halo: READY - open an elite chest");
+        } else {
+            std::ostringstream shieldStream;
+            const int healthLevel =
+                upgrades.GetPassiveUpgradeLevel(PassiveUpgradeType::MaxHealth);
+            shieldStream << "Orbiting Shield -> Aegis Halo: Orbiting Shield Lv."
+                         << orbitingShield->GetLevel() << "/"
+                         << orbitingShield->GetMaxLevel()
+                         << ", Vital Core Lv."
+                         << std::min(healthLevel,
+                                     ORBITING_SHIELD_EVOLUTION_HEALTH_LEVEL)
+                         << "/" << ORBITING_SHIELD_EVOLUTION_HEALTH_LEVEL;
+            statuses.push_back(shieldStream.str());
+        }
+    }
+
     std::ostringstream stream;
     for (std::size_t i = 0; i < statuses.size(); ++i) {
         if (i > 0) {
@@ -316,6 +354,15 @@ bool WeaponInventory::CanEvolveArcaneNova(
                ARCANE_NOVA_EVOLUTION_COOLDOWN_LEVEL);
 }
 
+bool WeaponInventory::CanEvolveOrbitingShield(
+    const UpgradeManager &upgrades) const {
+    const Weapon *weapon = FindWeapon(WeaponType::OrbitingShield);
+    return weapon != nullptr && !weapon->CanLevelUp() &&
+           upgrades.HasPassiveUpgradeLevel(
+               PassiveUpgradeType::MaxHealth,
+               ORBITING_SHIELD_EVOLUTION_HEALTH_LEVEL);
+}
+
 bool WeaponInventory::ReplaceWeapon(WeaponType originalType,
                                     std::unique_ptr<Weapon> evolvedWeapon) {
     if (evolvedWeapon == nullptr) {
@@ -351,6 +398,8 @@ const Weapon *WeaponInventory::FindWeapon(WeaponType type) const {
 
 std::unique_ptr<Weapon> WeaponInventory::CreateWeapon(WeaponType type) const {
     switch (type) {
+        case WeaponType::AegisHalo:
+            return std::make_unique<AegisHaloWeapon>(m_FontPath);
         case WeaponType::MagicBolt:
             return std::make_unique<MagicBoltWeapon>(m_FontPath);
         case WeaponType::ArcaneNova:

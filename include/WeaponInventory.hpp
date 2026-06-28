@@ -52,6 +52,7 @@ private:
                                    const UpgradeManager &upgrades) const;
     bool CanEvolveArcaneNova(const UpgradeManager &upgrades) const;
     bool CanEvolveMagicBolt(const UpgradeManager &upgrades) const;
+    bool CanEvolveOrbitingShield(const UpgradeManager &upgrades) const;
     bool ReplaceWeapon(WeaponType originalType,
                        std::unique_ptr<Weapon> evolvedWeapon);
     Weapon *FindWeapon(WeaponType type);

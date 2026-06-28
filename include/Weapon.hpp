@@ -13,6 +13,7 @@ enum class WeaponType {
     OrbitingShield,
     RunicLance,
     StarfallNova,
+    AegisHalo,
 };
 
 inline std::string GetWeaponTypeDisplayName(WeaponType type) {
@@ -27,6 +28,8 @@ inline std::string GetWeaponTypeDisplayName(WeaponType type) {
             return "Runic Lance";
         case WeaponType::StarfallNova:
             return "Starfall Nova";
+        case WeaponType::AegisHalo:
+            return "Aegis Halo";
         default:
             return "Unknown Weapon";
     }
